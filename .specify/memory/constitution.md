@@ -1,50 +1,140 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report:
+Version: NEW → 1.0.0 (MINOR: Initial constitution creation)
+Modified Principles: N/A (initial creation)
+Added Sections:
+  - Core Principles (4 principles: Readability First, Test-Driven Development, Simplicity Over Abstraction, User Experience Priority)
+  - Development Standards
+  - Quality Gates
+  - Governance
+Removed Sections: N/A
+Templates Status:
+  ✅ spec-template.md - Aligned (user stories and acceptance criteria support UX priority)
+  ✅ plan-template.md - Aligned (constitution check section will validate against these principles)
+  ✅ tasks-template.md - Aligned (test-first workflow and quality gates supported)
+Follow-up TODOs: None
+-->
+
+# Webform Sample Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Readability First
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+Code must be written for humans first, machines second. All code must prioritize clarity and comprehension over cleverness or brevity.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+**Rules:**
+- Use clear, descriptive names for variables, functions, and types
+- Prefer explicit code over implicit behavior
+- Include comments for non-obvious logic or business rules
+- Maintain consistent formatting and style across the codebase
+- Use LF line endings for all files (even on Windows)
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+**Rationale:** Readable code reduces maintenance burden, accelerates onboarding, and prevents bugs caused by misunderstanding. Code is read far more often than it is written.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### II. Test-Driven Development (NON-NEGOTIABLE)
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+Testing is mandatory for all features. Tests must be written first and must fail before implementation begins.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+**Rules:**
+- Tests MUST be written before implementation code
+- All tests MUST fail initially (red-green-refactor cycle)
+- Test coverage MUST include unit, integration, and contract tests where applicable
+- Tests MUST be executed with `bun run test` (NOT `bun test`)
+- All tests MUST pass before code review or merge
+- BDD tests MUST be executed for all user-facing features
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+**Rationale:** Test-first development ensures features are designed for testability, validates requirements understanding, and prevents regressions. Skipping tests is unacceptable and leads to quality degradation.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### III. Simplicity Over Abstraction
+
+Design must be simple and direct. Avoid premature optimization and unnecessary abstraction layers.
+
+**Rules:**
+- Start with the simplest solution that could work
+- Add abstraction only when concrete duplication patterns emerge
+- Reject patterns without clear, documented benefits
+- Apply YAGNI (You Aren't Gonna Need It) principle rigorously
+- Justify all complexity in documentation and code reviews
+
+**Rationale:** Over-engineering creates maintenance burden, increases cognitive load, and often solves problems that never materialize. Simple code is easier to understand, modify, and debug.
+
+### IV. User Experience Priority
+
+All features must be evaluated through the lens of user needs and experience.
+
+**Rules:**
+- User stories MUST be prioritized (P1, P2, P3) by value to users
+- Each user story MUST be independently testable and deliverable
+- Features MUST deliver measurable user value
+- User acceptance scenarios MUST be defined before implementation
+- Edge cases and error scenarios MUST consider user impact
+
+**Rationale:** Technology exists to serve users. Features that ignore user needs waste resources and create frustration. Prioritization ensures highest-value work happens first.
+
+## Development Standards
+
+### Code Quality
+
+- **Linting**: Execute `bun run lint` for all code changes (includes type checking)
+- **Line Endings**: All files MUST use LF line endings (configured in git and editors)
+- **Language**: Code comments and documentation may be in Japanese or English based on team preference
+- **Formatting**: Consistent formatting enforced by automated tools
+
+### Testing Standards
+
+- **Unit Tests**: Test individual functions/modules in isolation
+- **Integration Tests**: Test component interactions and data flow
+- **BDD/E2E Tests**: Test complete user scenarios end-to-end
+- **Test Execution**: Always use `bun run test` (reads vitest.config.ts correctly)
+- **Test Coverage**: Aim for high coverage but prioritize meaningful tests over percentage targets
+
+## Quality Gates
+
+All work must pass these gates before being considered complete:
+
+### Gate 1: Implementation Complete
+- [ ] Code written following readability standards
+- [ ] All tests written first and initially failed
+- [ ] All tests now pass (`bun run test`)
+- [ ] Lint and type check pass (`bun run lint`)
+
+### Gate 2: Review Ready
+- [ ] Code reviewed for simplicity and lack of over-abstraction
+- [ ] User stories validated against acceptance criteria
+- [ ] Edge cases and error scenarios documented
+- [ ] Build succeeds without errors
+
+### Gate 3: Merge Ready
+- [ ] All quality gates passed
+- [ ] Documentation updated (if applicable)
+- [ ] User experience validated through testing
+- [ ] No regressions introduced
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+### Authority
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+This constitution supersedes all other development practices and guidelines. When conflicts arise, this document takes precedence.
+
+### Amendment Process
+
+1. Proposed amendments MUST be documented with rationale
+2. Amendments MUST be reviewed by the team
+3. Version number MUST be incremented according to semantic versioning:
+   - **MAJOR**: Backward incompatible changes (removing/redefining principles)
+   - **MINOR**: New principles or sections added
+   - **PATCH**: Clarifications, wording improvements, typo fixes
+4. All dependent templates MUST be updated to reflect changes
+5. Migration plan MUST be provided for breaking changes
+
+### Compliance
+
+- All pull requests MUST verify compliance with these principles
+- Code reviews MUST explicitly check constitution adherence
+- Complexity violations MUST be justified in implementation plans
+- Quality gates MUST NOT be skipped under any circumstances
+
+### Version Control
+
+**Version**: 1.0.0 | **Ratified**: 2026-01-28 | **Last Amended**: 2026-01-28
