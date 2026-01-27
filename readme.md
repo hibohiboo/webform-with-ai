@@ -4,7 +4,9 @@ uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
 ```
 
 ```bash
-specify init <PROJECT_NAME>
+specify init .
 specify check
 ```
 
+specify checkの結果。 ready
+![](image.png)
