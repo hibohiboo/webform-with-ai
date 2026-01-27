@@ -10,6 +10,7 @@
 ### Session 2026-01-28
 
 - Q: How should apps be registered and managed in the system? → A: Apps defined in configuration file or database (managed by system administrator outside the web interface)
+- Q: How should the system handle unregistered app URLs (e.g., /app999/form)? → A: Return standard 404 error page
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -65,7 +66,6 @@
 
 ### Edge Cases
 
-- アプリ名が設定ファイル/データベースに登録されていない不正なURL（例: /app999/form）にアクセスした場合、どのように対応するか？（404エラー、または「アプリが見つかりません」というメッセージを表示）
 - 名前や自由記述欄に特殊文字（引用符、改行、カンマなど）が含まれる場合、CSV出力時に正しくエスケープされるか？
 - 同一ユーザーが同じアプリに対して複数回回答を送信した場合、すべての回答が個別に記録されるか？
 - 評価欄に1〜3以外の値（例: 0, 4, 文字列）が送信された場合、どのように検証・処理するか？
