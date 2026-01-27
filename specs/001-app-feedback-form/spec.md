@@ -5,6 +5,12 @@
 **Status**: Draft
 **Input**: User description: "複数のアプリに対する利用者の感想を収集するためのウェブフォームを作成したい。"
 
+## Clarifications
+
+### Session 2026-01-28
+
+- Q: How should apps be registered and managed in the system? → A: Apps defined in configuration file or database (managed by system administrator outside the web interface)
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - アプリ利用者がフォームから感想を送信する (Priority: P1)
