@@ -9,7 +9,7 @@
 
 ## 技術コンテキスト
 
-**言語/バージョン**: TypeScript 5.x（Lambda実行環境: Node.js 24.x、CDK未対応の場合は22.x）
+**言語/バージョン**: TypeScript 5.x（Lambda実行環境: Node.js 24.x）
 **主要依存ライブラリ**: AWS CDK, SurveyJS (survey-react-ui), React 19, React Router v7 (createBrowserRouter), esbuild（Lambdaバンドル）
 **ストレージ**: Amazon DynamoDB（スキーマ柔軟なドキュメントストレージのためのシングルテーブル設計）
 **テスト**: Vitest（単体/統合テスト）、Playwright（BDD/E2Eテスト）

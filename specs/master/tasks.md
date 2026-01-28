@@ -62,8 +62,9 @@
 - [ ] T018 `infrastructure/bin/app.ts` を作成（CDKアプリのエントリーポイント）
 - [ ] T019 `infrastructure/lib/backend-stack.ts` を作成（API Gateway, Lambda, DynamoDB）
   - DynamoDBテーブル: WebformResponses（PK, SK, GSI: AppIdIndex）
-  - 課金方式: PAY_PER_REQUEST
+  - 課金方式: PROVISIONED（無料枠対応）
   - ポイントインタイムリカバリ: 無効（コスト削減のため）
+  - Lambdaランタイム: NODEJS_24_X
 - [ ] T020 `infrastructure/lib/frontend-stack.ts` を作成（S3, CloudFront）
   - S3バケット: プライベート、OACでCloudFrontからのみアクセス
   - CloudFront: errorResponsesでSPAルーティング、/api/*をAPI Gatewayに転送

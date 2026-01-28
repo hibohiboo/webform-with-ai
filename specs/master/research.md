@@ -242,7 +242,7 @@ const apps: Record<string, AppConfig> = {
 - `S3Origin` → `S3BucketOrigin` に移行
 - `DnsValidatedCertificate` → `Certificate` に移行（今回はカスタムドメイン不使用）
 - `cf.experimental.EdgeFunction` → 不要（今回はCloudFront Functionsも不使用）
-- `NODEJS_18_X` → `NODEJS_22_X` に更新（Lambda実行環境）
+- `NODEJS_18_X` → `NODEJS_24_X` に更新（Lambda実行環境）
 
 ---
 
