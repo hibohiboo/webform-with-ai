@@ -12,6 +12,7 @@
 - Q: How should apps be registered and managed in the system? → A: Apps defined in configuration file or database (managed by system administrator outside the web interface)
 - Q: How should the system handle unregistered app URLs (e.g., /app999/form)? → A: Return standard 404 error page
 - Q: How should the system validate and handle invalid rating values (e.g., 0, 4, text input)? → A: Accept any value and store as-is (UI guides to 1-3 but storage is flexible for future rating scale changes)
+- Q: Should the CSV download require authentication or access control for administrators? → A: No authentication for MVP; add in future phase
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -69,7 +70,6 @@
 
 - 名前や自由記述欄に特殊文字（引用符、改行、カンマなど）が含まれる場合、CSV出力時に正しくエスケープされるか？
 - 同一ユーザーが同じアプリに対して複数回回答を送信した場合、すべての回答が個別に記録されるか？
-- 管理者用のCSVダウンロード機能に認証やアクセス制限は必要か？（初期実装では不要、将来的に追加の可能性）
 - 大量の回答データ（数千件以上）がある場合、CSVダウンロードのパフォーマンスは問題ないか？
 
 ## Requirements *(mandatory)*
@@ -85,6 +85,7 @@
 - **FR-004**: すべての入力項目は任意（optional）であり、利用者は何も入力せずに送信できなければならない
 - **FR-005**: フォームの送信ボタンを押すと、回答データ（アプリ名、名前、評価、自由記述、送信日時など）がシステムに保存されなければならない
 - **FR-006**: 管理者は、保存されたすべての回答データをCSV形式でダウンロードできなければならない
+- **FR-006-A**: MVPでは認証・アクセス制限は実装しない（将来的なフェーズで追加予定）
 - **FR-007**: CSV出力には、回答ID、アプリ名、名前、評価、自由記述、回答日時などの列が含まれなければならない
 - **FR-008**: 未入力の項目は、CSV出力時に空白（空セル）として表示されなければならない
 - **FR-009**: 将来的に入力項目が追加された場合、過去の回答データについても新しい項目の列を含むCSVが出力され、該当項目が存在しない回答では空白として扱われなければならない
