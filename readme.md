@@ -57,3 +57,34 @@ claude
 ```
 A - 評価は 任意項目.現在は 1〜3 だが、将来 4 段階以上に変わる可能性がある.厳密なバリデーションより データ収集の柔軟性を優先したい.UI は誘導するが、保存時は縛らない 
 ```
+
+# speckit.planで計画を立ててもらう
+
+```
+/speckit.plan
+This project is an MVP.
+
+Implement a single-page application hosted on Amazon S3 and delivered via CloudFront.
+Backend APIs must be routed through Amazon API Gateway and implemented with AWS Lambda.
+Do not use Lambda Function URLs or ALB.
+
+All infrastructure must be defined using AWS CDK (TypeScript).
+
+The feedback form UI should be implemented using SurveyJS.
+The form must support both Japanese and English.
+Form definitions should be data-driven and shared across applications.
+
+The same form is used for multiple applications, distinguished by URL paths such as /app1/form.
+Applications are registered and managed via configuration or data storage outside the web UI.
+
+Form fields are optional and may increase over time.
+The data model must support schema evolution without data migration.
+Validation should guide users in the UI, but backend storage must accept any values.
+
+Collected responses must be downloadable as CSV (UTF-8 with BOM).
+When new fields are added, CSV exports must include the new columns and leave blank values for older records.
+
+Do not introduce authentication, admin UI, or premature optimization.
+Prioritize simplicity, clarity, and long-term maintainability.
+
+```
