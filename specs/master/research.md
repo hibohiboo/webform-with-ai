@@ -121,7 +121,7 @@ CloudFront Distribution
 - `NodejsFunction` + esbuild（TypeScriptの自動トランスパイル）
 - `externalModules: ['@aws-sdk/*']`（AWS SDK v3はLambdaランタイムに含まれる）
 - `minify: true` でバンドルサイズを縮小
-- Node.js 20.xランタイム
+- Node.js 24.xランタイム
 
 ### CORS
 - CloudFrontをリバースプロキシとして使用し、SPAとAPIを同一オリジンに
@@ -217,7 +217,7 @@ const apps: Record<string, AppConfig> = {
 **フロー:**
 1. ユーザーが `/{appId}/form` にアクセス
 2. CloudFrontがindex.htmlを返す（SPA）
-3. React Routerが `/:appId/form` にマッチ
+3. React Router v7（createBrowserRouter）が `/:appId/form` にマッチ
 4. コンポーネントが `GET /api/{appId}` を呼び出してアプリ名を検証・取得
 5. 404の場合 → エラーページを表示。200の場合 → アプリ名付きでフォームをレンダリング
 

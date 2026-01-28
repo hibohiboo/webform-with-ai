@@ -9,11 +9,11 @@
 
 ## 技術コンテキスト
 
-**言語/バージョン**: TypeScript 5.x（Lambda実行環境: Node.js 20.x）
-**主要依存ライブラリ**: AWS CDK, SurveyJS (survey-react-ui), React 18, esbuild（Lambdaバンドル）
+**言語/バージョン**: TypeScript 5.x（Lambda実行環境: Node.js 24.x）
+**主要依存ライブラリ**: AWS CDK, SurveyJS (survey-react-ui), React 19, React Router v7 (createBrowserRouter), esbuild（Lambdaバンドル）
 **ストレージ**: Amazon DynamoDB（スキーマ柔軟なドキュメントストレージのためのシングルテーブル設計）
 **テスト**: Vitest（単体/統合テスト）、Playwright（BDD/E2Eテスト）
-**ターゲットプラットフォーム**: S3/CloudFront上のWeb SPA、Node.js 20.x上のLambda
+**ターゲットプラットフォーム**: S3/CloudFront上のWeb SPA、Node.js 24.x上のLambda
 **プロジェクト種別**: Webアプリケーション（フロントエンド + バックエンド + インフラ）
 **パフォーマンス目標**: フォーム送信 < 1秒、CSVダウンロード < 5秒（1000件以下の場合）
 **制約事項**: 認証なし、管理画面なし、MVPスコープ、すべてのフィールドは任意
@@ -98,7 +98,7 @@ backend/
 
 frontend/
 ├── src/
-│   ├── App.tsx                 # ルーター + SurveyJSフォームページ
+│   ├── App.tsx                 # React Router v7 (createBrowserRouter) + SurveyJSフォームページ
 │   ├── main.tsx                # エントリーポイント
 │   ├── components/
 │   │   ├── FeedbackForm.tsx    # SurveyJSフォームラッパー

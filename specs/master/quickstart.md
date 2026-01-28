@@ -4,7 +4,7 @@
 
 ## 前提条件
 
-- Node.js 20.x
+- Node.js 24.x
 - Bun（パッケージマネージャー兼テストランナー）
 - AWS CLIが有効な認証情報で設定済み
 - AWS CDK CLI（`npm install -g aws-cdk`）
