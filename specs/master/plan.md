@@ -130,6 +130,39 @@ e2e/
 
 **Structure Decision**: Web application pattern with separated frontend, backend, infrastructure, and e2e directories. Each has its own package.json for independent dependency management. The `shared/` types in backend are kept minimal — frontend uses its own API client types.
 
+## Constitution Re-Check (Post-Design)
+
+*Re-evaluation after Phase 1 design completion.*
+
+### I. Readability First
+- [x] **PASS**: Data model uses clear, descriptive field names (responseId, appId, submittedAt)
+- [x] **PASS**: API contracts documented in OpenAPI 3.0 format
+- [x] **PASS**: LF line endings enforced
+- [x] **PASS**: Form definition is data-driven JSON with explicit field definitions
+
+### II. Test-Driven Development (NON-NEGOTIABLE)
+- [x] **PASS**: Unit tests planned for each Lambda handler and CSV generation
+- [x] **PASS**: Integration tests planned for API endpoints
+- [x] **PASS**: BDD/E2E tests mapped to all acceptance scenarios in spec
+- [x] **PASS**: Test commands use `bun run test` per constitution
+
+### III. Simplicity Over Abstraction
+- [x] **PASS**: Single DynamoDB table with direct attribute storage (no EAV, no ORM)
+- [x] **PASS**: App config as JSON constant (no dynamic admin UI)
+- [x] **PASS**: 3 Lambda handlers (one per endpoint) — no shared framework
+- [x] **PASS**: Single CDK stack — no multi-stack or custom constructs
+- [x] **PASS**: Manual CSV generation — no unnecessary library dependency
+- [x] **PASS**: Direct Lambda response for CSV (no S3 presigned URL for MVP)
+
+### IV. User Experience Priority
+- [x] **PASS**: SurveyJS provides proven form UX with localization
+- [x] **PASS**: All fields optional — users can submit freely
+- [x] **PASS**: CSV with BOM for Excel compatibility
+- [x] **PASS**: 404 page for unregistered apps
+- [x] **PASS**: Submission confirmation shown after form completion
+
+**Post-Design Gate Result**: PASS — No violations. Design aligns with all constitution principles.
+
 ## Complexity Tracking
 
 > No violations detected. No complexity justification required.
