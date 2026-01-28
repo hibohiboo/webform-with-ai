@@ -13,7 +13,7 @@
 
 ```bash
 # リポジトリルートから実行
-cd infrastructure && bun install
+cd infrastructure && npm install
 cd ../backend && bun install
 cd ../frontend && bun install
 cd ../e2e && bun install
@@ -69,13 +69,13 @@ bun run test:ui
 cd infrastructure
 
 # CloudFormationテンプレートの合成
-bun run cdk synth
+npm run cdk synth
 
 # スタックのデプロイ
-bun run cdk deploy
+npm run cdk deploy
 
 # スタックの削除（クリーンアップ）
-bun run cdk destroy
+npm run cdk destroy
 ```
 
 ## アーキテクチャ概要
@@ -141,5 +141,5 @@ cd e2e && bun run test
 # lint（全プロジェクト）
 cd backend && bun run lint
 cd frontend && bun run lint
-cd infrastructure && bun run lint
+cd infrastructure && npm run lint
 ```

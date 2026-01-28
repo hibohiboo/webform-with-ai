@@ -17,37 +17,37 @@
 
 ### 1.1 インフラストラクチャ
 
-- [ ] T001 [P] `infrastructure/` ディレクトリを作成し、CDKプロジェクトを初期化（`cdk init app --language typescript`）
-- [ ] T002 [P] `infrastructure/package.json` に依存関係を追加（aws-cdk-lib, constructs）
-- [ ] T003 [P] `infrastructure/tsconfig.json` を設定（strict: true, LF改行）
-- [ ] T004 [P] `infrastructure/cdk.json` を設定
+- [x] T001 [P] `infrastructure/` ディレクトリを作成し、CDKプロジェクトを初期化（`cdk init app --language typescript`）
+- [x] T002 [P] `infrastructure/package.json` に依存関係を追加（aws-cdk-lib, constructs）
+- [x] T003 [P] `infrastructure/tsconfig.json` を設定（strict: true, LF改行）
+- [x] T004 [P] `infrastructure/cdk.json` を設定
 
 ### 1.2 バックエンド
 
-- [ ] T005 [P] `backend/` ディレクトリを作成し、package.jsonを初期化
-- [ ] T006 [P] `backend/package.json` に依存関係を追加（@aws-sdk/client-dynamodb, @aws-sdk/lib-dynamodb, ulid）
-- [ ] T007 [P] `backend/tsconfig.json` を設定（strict: true, ESM, LF改行）
-- [ ] T008 [P] `backend/vitest.config.ts` を設定
+- [x] T005 [P] `backend/` ディレクトリを作成し、package.jsonを初期化
+- [x] T006 [P] `backend/package.json` に依存関係を追加（@aws-sdk/client-dynamodb, @aws-sdk/lib-dynamodb, ulid）
+- [x] T007 [P] `backend/tsconfig.json` を設定（strict: true, ESM, LF改行）
+- [x] T008 [P] `backend/vitest.config.ts` を設定
 
 ### 1.3 フロントエンド
 
-- [ ] T009 [P] `frontend/` ディレクトリを作成し、Vite + React 19プロジェクトを初期化
-- [ ] T010 [P] `frontend/package.json` に依存関係を追加（react, react-dom, react-router, survey-core, survey-react-ui）
-- [ ] T011 [P] `frontend/tsconfig.json` を設定（strict: true, LF改行）
-- [ ] T012 [P] `frontend/vite.config.ts` を設定
+- [x] T009 [P] `frontend/` ディレクトリを作成し、Vite + React 19プロジェクトを初期化
+- [x] T010 [P] `frontend/package.json` に依存関係を追加（react, react-dom, react-router, survey-core, survey-react-ui）
+- [x] T011 [P] `frontend/tsconfig.json` を設定（strict: true, LF改行）
+- [x] T012 [P] `frontend/vite.config.ts` を設定
 
 ### 1.4 E2E
 
-- [ ] T013 [P] `e2e/` ディレクトリを作成し、package.jsonを初期化
-- [ ] T014 [P] `e2e/package.json` に依存関係を追加（@playwright/test）
-- [ ] T015 [P] `e2e/playwright.config.ts` を設定
+- [x] T013 [P] `e2e/` ディレクトリを作成し、package.jsonを初期化
+- [x] T014 [P] `e2e/package.json` に依存関係を追加（@playwright/test）
+- [x] T015 [P] `e2e/playwright.config.ts` を設定
 
 ### 1.5 共通設定
 
-- [ ] T016 `.gitattributes` をリポジトリルートに作成（LF改行を強制）
-- [ ] T017 `.editorconfig` をリポジトリルートに作成
+- [x] T016 `.gitattributes` をリポジトリルートに作成（LF改行を強制）
+- [x] T017 `.editorconfig` をリポジトリルートに作成
 
-**チェックポイント**: 全サブプロジェクトの `bun install` が成功すること
+**チェックポイント**: 全サブプロジェクトの依存関係インストールが成功すること（infrastructure は `npm install`、他は `bun install`）
 
 ---
 
@@ -92,7 +92,7 @@
 - [ ] T028 [P] `frontend/src/lib/api.ts` を作成（APIクライアント）
   - submitResponse, downloadCsv関数
 
-**チェックポイント**: `bun run cdk synth` が成功し、CloudFormationテンプレートが生成されること
+**チェックポイント**: `npm run cdk synth` が成功し、CloudFormationテンプレートが生成されること（infrastructure は npm を使用）
 
 ---
 
@@ -208,7 +208,7 @@
 - [ ] T045 [P] 全サブプロジェクトで `bun run lint` が通ることを確認
 - [ ] T046 [P] 全サブプロジェクトで `bun run test` が通ることを確認
 - [ ] T047 `quickstart.md` の手順を実行して動作確認
-- [ ] T048 AWSへのデプロイ（`bun run cdk deploy`）
+- [ ] T048 AWSへのデプロイ（`npm run cdk deploy`）※infrastructure は npm を使用
 
 ---
 
