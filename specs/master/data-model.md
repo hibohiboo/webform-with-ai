@@ -85,7 +85,7 @@ type FeedbackResponse = {
 
 **課金方式**: PAY_PER_REQUEST（オンデマンド）
 **暗号化**: AWSマネージド暗号化
-**ポイントインタイムリカバリ**: 有効
+**ポイントインタイムリカバリ**: 無効（コスト削減のため）
 
 ### GSI: AppIdIndex
 

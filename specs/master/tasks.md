@@ -63,7 +63,7 @@
 - [ ] T019 `infrastructure/lib/backend-stack.ts` を作成（API Gateway, Lambda, DynamoDB）
   - DynamoDBテーブル: WebformResponses（PK, SK, GSI: AppIdIndex）
   - 課金方式: PAY_PER_REQUEST
-  - ポイントインタイムリカバリ: 有効
+  - ポイントインタイムリカバリ: 無効（コスト削減のため）
 - [ ] T020 `infrastructure/lib/frontend-stack.ts` を作成（S3, CloudFront）
   - S3バケット: プライベート、OACでCloudFrontからのみアクセス
   - CloudFront: errorResponsesでSPAルーティング、/api/*をAPI Gatewayに転送
