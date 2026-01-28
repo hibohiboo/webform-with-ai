@@ -1,75 +1,75 @@
-# Implementation Plan: アプリ感想収集フォーム (App Feedback Collection Form)
+# 実装計画: アプリ感想収集フォーム
 
-**Branch**: `master` | **Date**: 2026-01-28 | **Spec**: [spec.md](../001-app-feedback-form/spec.md)
-**Input**: Feature specification from `/specs/001-app-feedback-form/spec.md`
+**ブランチ**: `master` | **日付**: 2026-01-28 | **仕様書**: [spec.md](../001-app-feedback-form/spec.md)
+**入力**: `/specs/001-app-feedback-form/spec.md` の機能仕様書
 
-## Summary
+## 概要
 
-Build an MVP web feedback form for collecting user responses across multiple applications. The system consists of a SurveyJS-based SPA hosted on S3/CloudFront, with backend APIs on API Gateway + Lambda, and DynamoDB for schema-flexible storage. Infrastructure is defined entirely in AWS CDK (TypeScript). The form supports Japanese/English, data-driven field definitions, schema evolution without migration, and CSV export with BOM.
+複数アプリのユーザー感想を収集するMVPウェブフォームを構築する。SurveyJSベースのSPAをS3/CloudFrontでホスティングし、バックエンドAPIはAPI Gateway + Lambdaで実装、DynamoDBでスキーマ柔軟なストレージを使用する。インフラはすべてAWS CDK（TypeScript）で定義する。フォームは日本語/英語対応、データ駆動のフィールド定義、マイグレーション不要のスキーマ進化、BOM付きCSVエクスポートをサポートする。
 
-## Technical Context
+## 技術コンテキスト
 
-**Language/Version**: TypeScript 5.x (Node.js 20.x for Lambda runtime)
-**Primary Dependencies**: AWS CDK, SurveyJS (survey-react-ui), React 18, esbuild (Lambda bundling)
-**Storage**: Amazon DynamoDB (single-table design for schema-flexible document storage)
-**Testing**: Vitest (unit/integration), Playwright (BDD/E2E)
-**Target Platform**: Web SPA on S3/CloudFront, Lambda on Node.js 20.x
-**Project Type**: Web application (frontend + backend + infrastructure)
-**Performance Goals**: Form submission < 1s, CSV download < 5s for 1000 records
-**Constraints**: No authentication, no admin UI, MVP scope, all fields optional
-**Scale/Scope**: Small scale MVP, hundreds to low thousands of responses
+**言語/バージョン**: TypeScript 5.x（Lambda実行環境: Node.js 20.x）
+**主要依存ライブラリ**: AWS CDK, SurveyJS (survey-react-ui), React 18, esbuild（Lambdaバンドル）
+**ストレージ**: Amazon DynamoDB（スキーマ柔軟なドキュメントストレージのためのシングルテーブル設計）
+**テスト**: Vitest（単体/統合テスト）、Playwright（BDD/E2Eテスト）
+**ターゲットプラットフォーム**: S3/CloudFront上のWeb SPA、Node.js 20.x上のLambda
+**プロジェクト種別**: Webアプリケーション（フロントエンド + バックエンド + インフラ）
+**パフォーマンス目標**: フォーム送信 < 1秒、CSVダウンロード < 5秒（1000件以下の場合）
+**制約事項**: 認証なし、管理画面なし、MVPスコープ、すべてのフィールドは任意
+**規模/スコープ**: 小規模MVP、数百〜数千件の回答
 
-## Constitution Check
+## 憲法チェック
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+*ゲート: Phase 0のリサーチ前に通過が必須。Phase 1設計後に再チェック。*
 
-### I. Readability First
-- [x] **PASS**: Clear naming conventions planned (TypeScript with explicit types)
-- [x] **PASS**: LF line endings enforced via .gitattributes and editor config
-- [x] **PASS**: Comments for business rules (form definition, CSV export logic)
+### I. 可読性優先
+- [x] **合格**: 明確な命名規則を計画済み（明示的な型を持つTypeScript）
+- [x] **合格**: .gitattributesとエディタ設定でLF改行コードを強制
+- [x] **合格**: ビジネスルールにコメントを付与（フォーム定義、CSVエクスポートロジック）
 
-### II. Test-Driven Development (NON-NEGOTIABLE)
-- [x] **PASS**: Unit tests for Lambda handlers (Vitest)
-- [x] **PASS**: Integration tests for API endpoints
-- [x] **PASS**: BDD/E2E tests for user scenarios (Playwright)
-- [x] **PASS**: Tests executed with `bun run test`
+### II. テスト駆動開発（必須）
+- [x] **合格**: Lambdaハンドラのユニットテスト（Vitest）
+- [x] **合格**: APIエンドポイントの統合テスト
+- [x] **合格**: ユーザーシナリオのBDD/E2Eテスト（Playwright）
+- [x] **合格**: テスト実行は `bun run test` を使用
 
-### III. Simplicity Over Abstraction
-- [x] **PASS**: Single-table DynamoDB (no ORM, no repository pattern)
-- [x] **PASS**: Minimal Lambda handlers (one per API endpoint)
-- [x] **PASS**: No authentication layer, no admin UI
-- [x] **PASS**: Direct CDK constructs (no custom construct libraries)
+### III. シンプルさ優先
+- [x] **合格**: DynamoDBシングルテーブル（ORM・リポジトリパターン不使用）
+- [x] **合格**: 最小限のLambdaハンドラ（APIエンドポイントごとに1つ）
+- [x] **合格**: 認証レイヤーなし、管理画面なし
+- [x] **合格**: CDKコンストラクトを直接使用（カスタムコンストラクトライブラリ不使用）
 
-### IV. User Experience Priority
-- [x] **PASS**: User stories prioritized (P1 > P2 > P3)
-- [x] **PASS**: SurveyJS handles form UX (validation, i18n)
-- [x] **PASS**: CSV with BOM for Excel compatibility
+### IV. ユーザー体験優先
+- [x] **合格**: ユーザーストーリーの優先順位付け（P1 > P2 > P3）
+- [x] **合格**: SurveyJSによるフォームUX（バリデーション、国際化対応）
+- [x] **合格**: BOM付きCSVによるExcel互換性
 
-**Gate Result**: PASS — No violations detected.
+**ゲート結果**: 合格 — 違反なし。
 
-## Project Structure
+## プロジェクト構成
 
-### Documentation (this feature)
+### ドキュメント（本機能）
 
 ```text
 specs/master/
-├── plan.md              # This file
-├── research.md          # Phase 0 output
-├── data-model.md        # Phase 1 output
-├── quickstart.md        # Phase 1 output
-├── contracts/           # Phase 1 output
-│   └── api.yaml         # OpenAPI specification
-└── tasks.md             # Phase 2 output (via /speckit.tasks)
+├── plan.md              # 本ファイル
+├── research.md          # Phase 0の成果物
+├── data-model.md        # Phase 1の成果物
+├── quickstart.md        # Phase 1の成果物
+├── contracts/           # Phase 1の成果物
+│   └── api.yaml         # OpenAPI仕様書
+└── tasks.md             # Phase 2の成果物（/speckit.tasksコマンドで生成）
 ```
 
-### Source Code (repository root)
+### ソースコード（リポジトリルート）
 
 ```text
 infrastructure/
 ├── bin/
-│   └── app.ts                  # CDK app entry point
+│   └── app.ts                  # CDKアプリのエントリーポイント
 ├── lib/
-│   └── webform-stack.ts        # CDK stack (S3, CloudFront, API GW, Lambda, DynamoDB)
+│   └── webform-stack.ts        # CDKスタック（S3, CloudFront, API GW, Lambda, DynamoDB）
 ├── cdk.json
 ├── tsconfig.json
 └── package.json
@@ -81,11 +81,11 @@ backend/
 │   │   ├── download-csv.ts     # GET /api/responses/csv
 │   │   └── get-app.ts          # GET /api/{appId}
 │   ├── lib/
-│   │   ├── dynamodb.ts         # DynamoDB client helpers
-│   │   ├── csv.ts              # CSV generation with BOM
-│   │   └── apps-config.ts      # App registry (config-driven)
+│   │   ├── dynamodb.ts         # DynamoDBクライアントヘルパー
+│   │   ├── csv.ts              # BOM付きCSV生成
+│   │   └── apps-config.ts      # アプリ定義（設定駆動）
 │   └── shared/
-│       └── types.ts            # Shared type definitions
+│       └── types.ts            # 共有型定義
 ├── tests/
 │   ├── unit/
 │   │   ├── submit-response.test.ts
@@ -98,17 +98,17 @@ backend/
 
 frontend/
 ├── src/
-│   ├── App.tsx                 # Router + SurveyJS form page
-│   ├── main.tsx                # Entry point
+│   ├── App.tsx                 # ルーター + SurveyJSフォームページ
+│   ├── main.tsx                # エントリーポイント
 │   ├── components/
-│   │   ├── FeedbackForm.tsx    # SurveyJS form wrapper
-│   │   └── ThankYou.tsx        # Submission confirmation
+│   │   ├── FeedbackForm.tsx    # SurveyJSフォームラッパー
+│   │   └── ThankYou.tsx        # 送信完了確認
 │   ├── lib/
-│   │   ├── api.ts              # API client
-│   │   ├── form-definition.ts  # Data-driven form JSON (shared)
-│   │   └── i18n.ts             # Japanese/English translations
+│   │   ├── api.ts              # APIクライアント
+│   │   ├── form-definition.ts  # データ駆動のフォーム定義JSON（共有）
+│   │   └── i18n.ts             # 日本語/英語の翻訳
 │   └── hooks/
-│       └── useApp.ts           # App data fetching hook
+│       └── useApp.ts           # アプリデータ取得フック
 ├── tests/
 │   ├── components/
 │   │   └── FeedbackForm.test.tsx
@@ -121,48 +121,48 @@ frontend/
 
 e2e/
 ├── tests/
-│   ├── submit-feedback.spec.ts   # User Story 1 BDD scenarios
-│   ├── download-csv.spec.ts      # User Story 2 BDD scenarios
-│   └── schema-evolution.spec.ts  # User Story 3 BDD scenarios
+│   ├── submit-feedback.spec.ts   # ユーザーストーリー1のBDDシナリオ
+│   ├── download-csv.spec.ts      # ユーザーストーリー2のBDDシナリオ
+│   └── schema-evolution.spec.ts  # ユーザーストーリー3のBDDシナリオ
 ├── playwright.config.ts
 └── package.json
 ```
 
-**Structure Decision**: Web application pattern with separated frontend, backend, infrastructure, and e2e directories. Each has its own package.json for independent dependency management. The `shared/` types in backend are kept minimal — frontend uses its own API client types.
+**構成の判断**: フロントエンド、バックエンド、インフラ、E2Eを分離したWebアプリケーションパターンを採用。各ディレクトリに独立したpackage.jsonを持ち、依存関係を個別に管理する。バックエンドの `shared/` 型定義は最小限に抑え、フロントエンドは独自のAPIクライアント型を使用する。
 
-## Constitution Re-Check (Post-Design)
+## 憲法再チェック（設計後）
 
-*Re-evaluation after Phase 1 design completion.*
+*Phase 1設計完了後の再評価。*
 
-### I. Readability First
-- [x] **PASS**: Data model uses clear, descriptive field names (responseId, appId, submittedAt)
-- [x] **PASS**: API contracts documented in OpenAPI 3.0 format
-- [x] **PASS**: LF line endings enforced
-- [x] **PASS**: Form definition is data-driven JSON with explicit field definitions
+### I. 可読性優先
+- [x] **合格**: データモデルに明確で説明的なフィールド名を使用（responseId, appId, submittedAt）
+- [x] **合格**: APIコントラクトをOpenAPI 3.0形式で文書化
+- [x] **合格**: LF改行コードを強制
+- [x] **合格**: フォーム定義は明示的なフィールド定義を持つデータ駆動JSON
 
-### II. Test-Driven Development (NON-NEGOTIABLE)
-- [x] **PASS**: Unit tests planned for each Lambda handler and CSV generation
-- [x] **PASS**: Integration tests planned for API endpoints
-- [x] **PASS**: BDD/E2E tests mapped to all acceptance scenarios in spec
-- [x] **PASS**: Test commands use `bun run test` per constitution
+### II. テスト駆動開発（必須）
+- [x] **合格**: 各Lambdaハンドラとcsv生成のユニットテストを計画済み
+- [x] **合格**: APIエンドポイントの統合テストを計画済み
+- [x] **合格**: 仕様書の全受け入れシナリオにBDD/E2Eテストを対応付け
+- [x] **合格**: 憲法に従いテストコマンドは `bun run test` を使用
 
-### III. Simplicity Over Abstraction
-- [x] **PASS**: Single DynamoDB table with direct attribute storage (no EAV, no ORM)
-- [x] **PASS**: App config as JSON constant (no dynamic admin UI)
-- [x] **PASS**: 3 Lambda handlers (one per endpoint) — no shared framework
-- [x] **PASS**: Single CDK stack — no multi-stack or custom constructs
-- [x] **PASS**: Manual CSV generation — no unnecessary library dependency
-- [x] **PASS**: Direct Lambda response for CSV (no S3 presigned URL for MVP)
+### III. シンプルさ優先
+- [x] **合格**: DynamoDBシングルテーブルで直接属性を保存（EAV・ORM不使用）
+- [x] **合格**: アプリ設定はJSON定数（動的な管理画面不使用）
+- [x] **合格**: 3つのLambdaハンドラ（エンドポイントごとに1つ） — 共有フレームワーク不使用
+- [x] **合格**: 単一CDKスタック — マルチスタックやカスタムコンストラクト不使用
+- [x] **合格**: 手動CSV生成 — 不必要なライブラリ依存なし
+- [x] **合格**: CSVはLambdaから直接レスポンス（MVPではS3署名付きURL不使用）
 
-### IV. User Experience Priority
-- [x] **PASS**: SurveyJS provides proven form UX with localization
-- [x] **PASS**: All fields optional — users can submit freely
-- [x] **PASS**: CSV with BOM for Excel compatibility
-- [x] **PASS**: 404 page for unregistered apps
-- [x] **PASS**: Submission confirmation shown after form completion
+### IV. ユーザー体験優先
+- [x] **合格**: SurveyJSによる実績あるフォームUXとローカライゼーション
+- [x] **合格**: すべてのフィールドが任意 — ユーザーは自由に送信可能
+- [x] **合格**: BOM付きCSVによるExcel互換性
+- [x] **合格**: 未登録アプリへの404ページ
+- [x] **合格**: フォーム完了後の送信確認表示
 
-**Post-Design Gate Result**: PASS — No violations. Design aligns with all constitution principles.
+**設計後ゲート結果**: 合格 — 違反なし。設計はすべての憲法原則に準拠。
 
-## Complexity Tracking
+## 複雑性の追跡
 
-> No violations detected. No complexity justification required.
+> 違反なし。複雑性の正当化は不要。
