@@ -1,20 +1,20 @@
-# Data Model: アプリ感想収集フォーム
+# データモデル: アプリ感想収集フォーム
 
-**Date**: 2026-01-28 | **Plan**: [plan.md](./plan.md)
+**日付**: 2026-01-28 | **計画書**: [plan.md](./plan.md)
 
-## Entities
+## エンティティ
 
-### App (アプリ)
+### App（アプリ）
 
-Configuration-driven entity. Not stored in DynamoDB — defined in backend code as JSON config.
+設定駆動のエンティティ。DynamoDBには保存せず、バックエンドコード内のJSON設定として定義する。
 
-| Field | Type | Description |
-|-------|------|-------------|
-| appId | string | URL path identifier (e.g., "app1") |
-| name | string | Display name in Japanese (e.g., "アプリ1") |
-| nameEn | string | Display name in English (e.g., "App 1") |
+| フィールド | 型 | 説明 |
+|-----------|------|-------------|
+| appId | string | URLパス識別子（例: "app1"） |
+| name | string | 日本語表示名（例: "アプリ1"） |
+| nameEn | string | 英語表示名（例: "App 1"） |
 
-**Storage**: TypeScript constant in `backend/src/lib/apps-config.ts`
+**保存先**: `backend/src/lib/apps-config.ts` 内のTypeScript定数
 
 ```typescript
 type AppConfig = {
@@ -24,28 +24,28 @@ type AppConfig = {
 };
 ```
 
-**Constraints**:
-- appId must be URL-safe (alphanumeric + hyphens)
-- name and nameEn are required
-- No duplicate appIds
+**制約**:
+- appIdはURL安全な文字列（英数字 + ハイフン）
+- nameとnameEnは必須
+- appIdの重複不可
 
 ---
 
-### Response (回答)
+### Response（回答）
 
-Core entity. Stored in DynamoDB.
+中核エンティティ。DynamoDBに保存する。
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| responseId | string (ULID) | Yes | Unique response identifier |
-| appId | string | Yes | Reference to app configuration |
-| submittedAt | string (ISO 8601) | Yes | Submission timestamp |
-| name | string | No | Respondent name |
-| rating | number | No | Rating value (UI guides 1-3, storage accepts any) |
-| comment | string | No | Free-text comment |
-| *(future fields)* | *any* | *No* | *Additional fields added over time* |
+| フィールド | 型 | 必須 | 説明 |
+|-----------|------|----------|-------------|
+| responseId | string (ULID) | はい | 一意の回答識別子 |
+| appId | string | はい | アプリ設定への参照 |
+| submittedAt | string (ISO 8601) | はい | 送信日時 |
+| name | string | いいえ | 回答者名 |
+| rating | number | いいえ | 評価値（UIは1〜3を誘導、保存時は任意の値を受け入れ） |
+| comment | string | いいえ | 自由記述コメント |
+| *（将来のフィールド）* | *any* | *いいえ* | *将来追加されるフィールド* |
 
-**Storage**: DynamoDB single-table
+**保存先**: DynamoDBシングルテーブル
 
 ```typescript
 type FeedbackResponse = {
@@ -59,83 +59,83 @@ type FeedbackResponse = {
 };
 ```
 
-**Constraints**:
-- responseId is generated server-side (ULID)
-- submittedAt is generated server-side (ISO 8601 UTC)
-- All user-input fields are optional
-- Backend accepts any values without validation (per FR-003-A)
-- Duplicate submissions from same user are stored as separate records (per FR-010)
+**制約**:
+- responseIdはサーバー側で生成（ULID）
+- submittedAtはサーバー側で生成（ISO 8601 UTC）
+- ユーザー入力フィールドはすべて任意
+- バックエンドはバリデーションなしで任意の値を受け入れる（FR-003-Aに準拠）
+- 同一ユーザーからの重複送信は個別レコードとして保存（FR-010に準拠）
 
 ---
 
-## DynamoDB Table Design
+## DynamoDBテーブル設計
 
-### Table: WebformResponses
+### テーブル: WebformResponses
 
-| Attribute | Type | Role |
+| 属性 | 型 | 役割 |
 |-----------|------|------|
-| PK | String | Partition key: `RESPONSE#{responseId}` |
-| SK | String | Sort key: `APP#{appId}#TS#{submittedAt}` |
+| PK | String | パーティションキー: `RESPONSE#{responseId}` |
+| SK | String | ソートキー: `APP#{appId}#TS#{submittedAt}` |
 | responseId | String | ULID |
-| appId | String | App identifier |
-| submittedAt | String | ISO 8601 timestamp |
-| name | String | Optional respondent name |
-| rating | Number | Optional rating value |
-| comment | String | Optional free-text comment |
+| appId | String | アプリ識別子 |
+| submittedAt | String | ISO 8601タイムスタンプ |
+| name | String | 任意の回答者名 |
+| rating | Number | 任意の評価値 |
+| comment | String | 任意の自由記述コメント |
 
-**Billing**: PAY_PER_REQUEST (on-demand)
-**Encryption**: AWS managed encryption
-**Point-in-time recovery**: Enabled
+**課金方式**: PAY_PER_REQUEST（オンデマンド）
+**暗号化**: AWSマネージド暗号化
+**ポイントインタイムリカバリ**: 有効
 
 ### GSI: AppIdIndex
 
-| Attribute | Type | Role |
+| 属性 | 型 | 役割 |
 |-----------|------|------|
-| appId | String | GSI partition key |
-| submittedAt | String | GSI sort key |
+| appId | String | GSIパーティションキー |
+| submittedAt | String | GSIソートキー |
 
-**Projection**: ALL (required for CSV export flexibility with future fields)
+**プロジェクション**: ALL（将来のフィールドを含むCSVエクスポートの柔軟性のために必要）
 
-### Access Patterns
+### アクセスパターン
 
-| Pattern | Operation | Key Condition |
+| パターン | 操作 | キー条件 |
 |---------|-----------|---------------|
-| Submit response | PutItem | PK=RESPONSE#{id}, SK=APP#{appId}#TS#{ts} |
-| Export all as CSV | Scan (paginated) | Full table scan, 1MB per page |
-| Query by appId | Query on AppIdIndex | appId = {appId} |
+| 回答送信 | PutItem | PK=RESPONSE#{id}, SK=APP#{appId}#TS#{ts} |
+| 全件CSV出力 | Scan（ページネーション付き） | テーブル全体スキャン、1ページ1MB |
+| appId別クエリ | AppIdIndexでQuery | appId = {appId} |
 
 ---
 
-## Schema Evolution Strategy
+## スキーマ進化戦略
 
-### Adding New Fields
+### 新しいフィールドの追加
 
-When a new form field is added (e.g., "recommendation"):
+新しいフォームフィールドを追加する場合（例: 「推奨度」）:
 
-1. **Form definition**: Add new question to SurveyJS JSON
-2. **Backend handler**: No change needed — accepts any JSON fields
-3. **DynamoDB**: New items include the attribute; old items lack it (sparse)
-4. **CSV export**: Discovers all attribute names across all items, includes new column
-5. **TypeScript types**: Add optional property to FeedbackResponse type
+1. **フォーム定義**: SurveyJS JSONに新しい質問を追加
+2. **バックエンドハンドラ**: 変更不要 — 任意のJSONフィールドを受け入れる
+3. **DynamoDB**: 新しいアイテムには属性が含まれ、古いアイテムには含まれない（スパース）
+4. **CSVエクスポート**: 全アイテムの属性名の和集合を収集し、新しい列を含める
+5. **TypeScript型**: FeedbackResponse型にオプショナルプロパティを追加
 
-### CSV Column Generation
+### CSV列の生成
 
-1. Scan all items from DynamoDB
-2. Collect union of all attribute keys (excluding PK, SK)
-3. Fixed columns first: `responseId`, `appId`, `submittedAt`
-4. Dynamic columns in alphabetical order: `comment`, `name`, `rating`, ...
-5. Old records without new fields → empty cell in CSV
+1. DynamoDBから全アイテムをスキャン
+2. すべての属性キーの和集合を収集（PK、SKを除く）
+3. 固定列を先頭に配置: `responseId`, `appId`, `submittedAt`
+4. 動的列はアルファベット順: `comment`, `name`, `rating`, ...
+5. 新しいフィールドがない古いレコード → CSVでは空セル
 
-### Example: Before and After Adding "recommendation"
+### 例: 「recommendation」追加前後
 
-**Before** (CSV):
+**追加前**（CSV）:
 ```csv
 responseId,appId,submittedAt,comment,name,rating
 r001,app1,2026-01-28T10:00:00Z,使いやすかった,山田太郎,2
 r002,app1,2026-01-28T11:00:00Z,,,
 ```
 
-**After** adding "recommendation" field:
+**「recommendation」フィールド追加後**:
 ```csv
 responseId,appId,submittedAt,comment,name,rating,recommendation
 r001,app1,2026-01-28T10:00:00Z,使いやすかった,山田太郎,2,
@@ -145,10 +145,10 @@ r003,app1,2026-01-29T09:00:00Z,最高です,佐藤花子,3,5
 
 ---
 
-## Relationships
+## リレーションシップ
 
 ```
-AppConfig (JSON config)        FeedbackResponse (DynamoDB)
+AppConfig (JSON設定)            FeedbackResponse (DynamoDB)
 ┌─────────────────┐            ┌──────────────────────┐
 │ appId (PK)      │◄───────────│ appId (FK)           │
 │ name            │            │ responseId (PK)      │
@@ -160,6 +160,6 @@ AppConfig (JSON config)        FeedbackResponse (DynamoDB)
                                └──────────────────────┘
 ```
 
-- One App has many Responses (1:N)
-- Relationship enforced at application level (not database foreign key)
-- Invalid appId in request → 404 from app config lookup
+- 1つのAppに対して複数のResponseが存在する（1:N）
+- リレーションシップはアプリケーション層で管理（データベースの外部キーではない）
+- リクエスト内の無効なappId → アプリ設定の参照で404を返す

@@ -1,23 +1,23 @@
-# Research: アプリ感想収集フォーム
+# リサーチ: アプリ感想収集フォーム
 
-**Date**: 2026-01-28 | **Plan**: [plan.md](./plan.md)
+**日付**: 2026-01-28 | **計画書**: [plan.md](./plan.md)
 
-## 1. DynamoDB Data Model Design
+## 1. DynamoDBデータモデル設計
 
-### Decision: Single-table design with sparse attributes
+### 決定: スパース属性を用いたシングルテーブル設計
 
-**Rationale:**
-- DynamoDB is schemaless by design — adding new attributes requires no migration
-- Omitting attributes (instead of storing null) saves storage and keeps sparse indexes efficient
-- Only 2 entity types (apps + responses) with simple access patterns — single-table is appropriate
-- No ORM or repository pattern needed (constitution: Simplicity Over Abstraction)
+**根拠:**
+- DynamoDBは設計上スキーマレス — 新しい属性の追加にマイグレーション不要
+- 属性を省略する（nullを保存しない）ことでストレージを節約し、スパースインデックスの効率を維持
+- エンティティは2種類（アプリ + 回答）のみでアクセスパターンも単純 — シングルテーブルが適切
+- ORMやリポジトリパターンは不要（憲法: シンプルさ優先）
 
-**Alternatives considered:**
-- Multi-table design — rejected: unnecessary complexity for 2 entity types
-- EAV (Entity-Attribute-Value) pattern — rejected: overengineering for this use case
-- RDS/PostgreSQL — rejected: requires schema migrations, more operational overhead
+**検討した代替案:**
+- マルチテーブル設計 — 却下: 2つのエンティティには不必要な複雑さ
+- EAV（Entity-Attribute-Value）パターン — 却下: このユースケースには過剰設計
+- RDS/PostgreSQL — 却下: スキーママイグレーションが必要、運用負荷が高い
 
-### Table Design
+### テーブル設計
 
 ```
 Table: WebformResponses
@@ -30,77 +30,77 @@ Table: WebformResponses
     Projection: ALL
 ```
 
-**Access Patterns:**
-| Pattern | Method | Key Condition |
+**アクセスパターン:**
+| パターン | メソッド | キー条件 |
 |---------|--------|---------------|
-| Submit response | PutItem | PK = RESPONSE#{id} |
-| Get all responses (CSV) | Scan with pagination | Full table scan |
-| Get responses by app | Query on GSI | appId = "app1" |
-| Validate app exists | Config lookup | Not in DynamoDB |
+| 回答送信 | PutItem | PK = RESPONSE#{id} |
+| 全回答取得（CSV） | ページネーション付きScan | テーブル全体スキャン |
+| アプリ別回答取得 | GSIでQuery | appId = "app1" |
+| アプリ存在確認 | 設定ファイル参照 | DynamoDB外 |
 
-**Schema Evolution:**
-- New fields are added as attributes on new items — no migration needed
-- Old items simply lack the attribute (sparse)
-- CSV export collects union of all attribute names across all items
-- TypeScript types use optional properties (`field?: type`)
-
----
-
-## 2. SurveyJS Integration
-
-### Decision: survey-core + survey-react-ui (v2.x)
-
-**Rationale:**
-- SurveyJS is purpose-built for data-driven JSON form definitions
-- Built-in Japanese localization support (50+ languages included)
-- Rating question type natively supports configurable scale
-- `onComplete` event provides clean JSON data for API submission
-- Active maintenance (v2.3.x, January 2026)
-
-**Alternatives considered:**
-- Custom React forms — rejected: more development effort, no built-in i18n/rating
-- React Hook Form — rejected: not data-driven, no form definition sharing
-- Formik — rejected: same limitations as React Hook Form
-
-### Packages Required
-
-```
-survey-core        # Platform-independent logic
-survey-react-ui    # React rendering components
-```
-
-### Localization Approach
-- Import `survey-core/survey.i18n.ja` for Japanese UI strings
-- Form definition JSON supports `{ "en": "...", "ja": "..." }` per field
-- Set `survey.locale = "ja"` or `"en"` based on browser/user preference
-- SurveyJS handles button labels, validation messages, etc. automatically
-
-### Form Definition (Data-Driven)
-- Store form JSON as a TypeScript constant (shared configuration)
-- JSON defines questions, types, localized titles, and display options
-- Same definition used across all apps — app name injected dynamically
-- All fields set with `isRequired: false` (or omitted, as false is default)
+**スキーマ進化:**
+- 新しいフィールドは新しいアイテムの属性として追加 — マイグレーション不要
+- 古いアイテムには単にその属性がない（スパース）
+- CSVエクスポートは全アイテムの属性名の和集合を収集
+- TypeScript型ではオプショナルプロパティを使用（`field?: type`）
 
 ---
 
-## 3. AWS CDK Architecture
+## 2. SurveyJS統合
 
-### Decision: Single stack with RestApi, NodejsFunction, S3/CloudFront
+### 決定: survey-core + survey-react-ui（v2.x）
 
-**Rationale:**
-- Single stack is simpler for MVP (all resources share lifecycle)
-- RestApi over HttpApi for better CloudFront integration and maturity
-- NodejsFunction with esbuild for fast bundling and tree-shaking
-- OAC (Origin Access Control) over legacy OAI for S3 security
-- CloudFront serves as single entry point, eliminating CORS complexity
+**根拠:**
+- SurveyJSはデータ駆動のJSONフォーム定義に特化して構築されている
+- 日本語ローカライゼーションを組み込みでサポート（50以上の言語を含む）
+- Ratingの質問タイプが設定可能なスケールをネイティブにサポート
+- `onComplete`イベントがAPI送信用のクリーンなJSONデータを提供
+- 活発なメンテナンス（v2.3.x、2026年1月時点）
 
-**Alternatives considered:**
-- HttpApi — rejected: less mature CloudFront integration, limited feature set
-- Multiple stacks — rejected: unnecessary for MVP scope
-- Lambda Function URLs — rejected: explicitly excluded by requirements
-- ALB — rejected: explicitly excluded by requirements
+**検討した代替案:**
+- カスタムReactフォーム — 却下: 開発工数が多い、組み込みのi18n/ratingなし
+- React Hook Form — 却下: データ駆動でない、フォーム定義の共有不可
+- Formik — 却下: React Hook Formと同様の制限
 
-### CloudFront Routing
+### 必要なパッケージ
+
+```
+survey-core        # プラットフォーム非依存のロジック
+survey-react-ui    # Reactレンダリングコンポーネント
+```
+
+### ローカライゼーション方針
+- 日本語UIストリングのために `survey-core/survey.i18n.ja` をインポート
+- フォーム定義JSONはフィールドごとに `{ "en": "...", "ja": "..." }` をサポート
+- ブラウザ/ユーザーの設定に基づいて `survey.locale = "ja"` または `"en"` を設定
+- SurveyJSがボタンラベル、バリデーションメッセージなどを自動的に処理
+
+### フォーム定義（データ駆動）
+- フォームJSONをTypeScript定数として保存（共有設定）
+- JSONが質問、型、ローカライズされたタイトル、表示オプションを定義
+- 全アプリで同一の定義を使用 — アプリ名を動的に注入
+- すべてのフィールドは `isRequired: false` に設定（省略した場合もfalseがデフォルト）
+
+---
+
+## 3. AWS CDKアーキテクチャ
+
+### 決定: RestApi、NodejsFunction、S3/CloudFrontを含む単一スタック
+
+**根拠:**
+- 単一スタックはMVPにとってシンプル（全リソースが同一ライフサイクルを共有）
+- CloudFront統合の成熟度とより良い互換性のためにHttpApiよりRestApiを選択
+- 高速なバンドルとツリーシェイキングのためにNodejsFunction + esbuildを使用
+- S3セキュリティのためにレガシーOAIではなくOAC（Origin Access Control）を使用
+- CloudFrontを単一のエントリーポイントとして使用し、CORSの複雑さを排除
+
+**検討した代替案:**
+- HttpApi — 却下: CloudFront統合が未成熟、機能セットが限定的
+- 複数スタック — 却下: MVPスコープには不必要
+- Lambda Function URLs — 却下: 要件で明示的に除外
+- ALB — 却下: 要件で明示的に除外
+
+### CloudFrontルーティング
 
 ```
 CloudFront Distribution
@@ -110,90 +110,90 @@ CloudFront Distribution
     └── Routes to Lambda functions
 ```
 
-**Key Configuration:**
-- `S3BucketOrigin.withOriginAccessControl(bucket)` for secure S3 access
-- `errorResponses` to return index.html for 404 (SPA routing)
-- `additionalBehaviors` for /api/* path to API Gateway
-- Custom origin request policy (exclude Host header to avoid API GW 403)
-- `CachePolicy.CACHING_DISABLED` for API behavior
+**主要な設定:**
+- `S3BucketOrigin.withOriginAccessControl(bucket)` によるセキュアなS3アクセス
+- `errorResponses` で404時にindex.htmlを返す（SPAルーティング）
+- `additionalBehaviors` で/api/*パスをAPI Gatewayに転送
+- カスタムオリジンリクエストポリシー（Hostヘッダーを除外してAPI GWの403を回避）
+- APIビヘイビアに `CachePolicy.CACHING_DISABLED` を設定
 
-### Lambda Bundling
-- `NodejsFunction` with esbuild (automatic TypeScript transpilation)
-- `externalModules: ['@aws-sdk/*']` (AWS SDK v3 is in Lambda runtime)
-- `minify: true` for smaller bundles
-- Node.js 20.x runtime
+### Lambdaバンドル
+- `NodejsFunction` + esbuild（TypeScriptの自動トランスパイル）
+- `externalModules: ['@aws-sdk/*']`（AWS SDK v3はLambdaランタイムに含まれる）
+- `minify: true` でバンドルサイズを縮小
+- Node.js 20.xランタイム
 
 ### CORS
-- CloudFront as reverse proxy makes SPA and API same-origin
-- CORS headers still needed for development (localhost) and preflight requests
-- Configure `defaultCorsPreflightOptions` on RestApi
+- CloudFrontをリバースプロキシとして使用し、SPAとAPIを同一オリジンに
+- 開発環境（localhost）とプリフライトリクエストにはCORSヘッダーが引き続き必要
+- RestApiに `defaultCorsPreflightOptions` を設定
 
 ---
 
-## 4. CSV Generation
+## 4. CSV生成
 
-### Decision: Manual generation with UTF-8 BOM, direct Lambda response
+### 決定: UTF-8 BOM付き手動生成、Lambdaからの直接レスポンス
 
-**Rationale:**
-- Simple requirements (known column structure, RFC 4180 escaping)
-- No external dependency needed — reduces Lambda bundle size
-- Direct Lambda response works for MVP scale (< 9,000 records)
-- BOM (`\uFEFF`) required for Japanese text Excel compatibility
+**根拠:**
+- シンプルな要件（既知の列構造、RFC 4180エスケープ）
+- 外部依存ライブラリ不要 — Lambdaバンドルサイズを削減
+- Lambdaからの直接レスポンスはMVP規模で十分（9,000件未満）
+- BOM（`\uFEFF`）は日本語テキストのExcel互換性に必要
 
-**Alternatives considered:**
-- csv library (fast-csv, papaparse) — rejected: unnecessary dependency for simple case
-- S3 presigned URL approach — rejected: premature optimization for MVP
-- Lambda streaming response — rejected: requires Lambda Function URLs (excluded)
+**検討した代替案:**
+- csvライブラリ（fast-csv、papaparse）— 却下: シンプルなケースには不必要な依存
+- S3署名付きURLアプローチ — 却下: MVPには時期尚早な最適化
+- Lambdaストリーミングレスポンス — 却下: Lambda Function URLsが必要（除外済み）
 
-### Implementation Details
+### 実装詳細
 
-**BOM**: `\uFEFF` (U+FEFF) prepended to CSV content
+**BOM**: `\uFEFF`（U+FEFF）をCSVコンテンツの先頭に付加
 
-**Escaping (RFC 4180):**
-- Fields containing comma, newline, or double-quote are wrapped in quotes
-- Double-quotes within fields are doubled (`"` → `""`)
-- Empty/missing fields rendered as empty string (not null)
+**エスケープ（RFC 4180）:**
+- カンマ、改行、ダブルクォートを含むフィールドはクォートで囲む
+- フィールド内のダブルクォートは二重化（`"` → `""`）
+- 空/未入力フィールドは空文字列として出力（nullではない）
 
-**HTTP Response:**
+**HTTPレスポンス:**
 ```
 Content-Type: text/csv; charset=utf-8
 Content-Disposition: attachment; filename="feedback.csv"
 isBase64Encoded: true  (Lambda response format)
 ```
 
-**API Gateway:** Binary media type `text/csv` configured
+**API Gateway:** バイナリメディアタイプ `text/csv` を設定
 
-**Capacity Limits:**
-| Records | Approach | Status |
+**容量制限:**
+| レコード数 | アプローチ | ステータス |
 |---------|----------|--------|
-| < 9,000 | Direct Lambda response | MVP (current) |
-| 9,000+ | S3 presigned URL | Future upgrade path |
+| 9,000件未満 | Lambdaからの直接レスポンス | MVP（現在） |
+| 9,000件以上 | S3署名付きURL | 将来のアップグレードパス |
 
-**Dynamic Columns:**
-1. Scan all responses from DynamoDB (with pagination)
-2. Collect union of all attribute names
-3. Fixed columns first: responseId, appId, appName, timestamp
-4. Dynamic columns follow (alphabetical order)
-5. Missing attributes in old records → empty cell
+**動的カラム:**
+1. DynamoDBから全回答をスキャン（ページネーション付き）
+2. すべての属性名の和集合を収集
+3. 固定列を先頭に配置: responseId, appId, appName, timestamp
+4. 動的列はアルファベット順で続く
+5. 古いレコードに存在しない属性 → 空セル
 
 ---
 
-## 5. App Registration
+## 5. アプリ登録
 
-### Decision: JSON configuration file in backend code
+### 決定: バックエンドコード内のJSON設定ファイル
 
-**Rationale:**
-- Spec states "apps defined in configuration file or database"
-- JSON config is simplest for MVP (YAGNI — no admin UI needed)
-- Adding/modifying apps requires code deployment (acceptable for MVP)
-- Config can be moved to DynamoDB later if dynamic management is needed
+**根拠:**
+- 仕様書に「アプリは設定ファイルまたはデータベースで定義」と記載
+- JSON設定はMVPにとって最もシンプル（YAGNI — 管理画面は不要）
+- アプリの追加/変更にはコードのデプロイが必要（MVPでは許容範囲）
+- 動的管理が必要になった場合、後からDynamoDBに移行可能
 
-**Alternatives considered:**
-- DynamoDB-based app registry — rejected: premature for MVP, adds complexity
-- Environment variables — rejected: not structured enough for app metadata
-- S3 config file — rejected: adds S3 read on every request
+**検討した代替案:**
+- DynamoDBベースのアプリレジストリ — 却下: MVPには時期尚早、複雑さが増す
+- 環境変数 — 却下: アプリメタデータには構造化が不十分
+- S3設定ファイル — 却下: リクエストごとにS3読み取りが発生
 
-### Config Structure
+### 設定構造
 
 ```typescript
 const apps: Record<string, AppConfig> = {
@@ -204,26 +204,26 @@ const apps: Record<string, AppConfig> = {
 
 ---
 
-## 6. Routing and 404 Handling
+## 6. ルーティングと404ハンドリング
 
-### Decision: Frontend router validates appId via API, shows 404 page
+### 決定: フロントエンドルーターがAPI経由でappIdを検証し、404ページを表示
 
-**Rationale:**
-- SPA architecture means frontend handles routing
-- Frontend fetches app info from `GET /api/{appId}` endpoint
-- If app not found, API returns 404 → frontend shows 404 page
-- CloudFront error responses handle direct URL access to non-existent SPA routes
+**根拠:**
+- SPAアーキテクチャではフロントエンドがルーティングを処理
+- フロントエンドが `GET /api/{appId}` エンドポイントからアプリ情報を取得
+- アプリが見つからない場合、APIが404を返す → フロントエンドが404ページを表示
+- CloudFrontのエラーレスポンスが、存在しないSPAルートへの直接アクセスを処理
 
-**Flow:**
-1. User accesses `/{appId}/form`
-2. CloudFront serves index.html (SPA)
-3. React Router matches `/:appId/form`
-4. Component calls `GET /api/{appId}` to validate and get app name
-5. If 404 → show error page. If 200 → render form with app name
+**フロー:**
+1. ユーザーが `/{appId}/form` にアクセス
+2. CloudFrontがindex.htmlを返す（SPA）
+3. React Routerが `/:appId/form` にマッチ
+4. コンポーネントが `GET /api/{appId}` を呼び出してアプリ名を検証・取得
+5. 404の場合 → エラーページを表示。200の場合 → アプリ名付きでフォームをレンダリング
 
 ---
 
-## Sources
+## 参考資料
 
 ### DynamoDB
 - [Best practices for designing and using partition keys effectively](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html)
@@ -236,7 +236,7 @@ const apps: Record<string, AppConfig> = {
 - [Survey Localization](https://surveyjs.io/form-library/documentation/survey-localization)
 - [Rating Scale Question](https://surveyjs.io/form-library/documentation/api-reference/rating-scale-question-model)
 
-### AWS CDK / Architecture
+### AWS CDK / アーキテクチャ
 - [Deploy a React SPA to S3 and CloudFront](https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/deploy-a-react-based-single-page-application-to-amazon-s3-and-cloudfront.html)
 - [aws-cdk-lib.aws_lambda_nodejs module](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_lambda_nodejs-readme.html)
 - [CloudFront Origin Access Control L2 construct](https://aws.amazon.com/blogs/devops/a-new-aws-cdk-l2-construct-for-amazon-cloudfront-origin-access-control-oac/)

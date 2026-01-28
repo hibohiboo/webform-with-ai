@@ -1,144 +1,144 @@
-# Quickstart: アプリ感想収集フォーム
+# クイックスタート: アプリ感想収集フォーム
 
-**Date**: 2026-01-28 | **Plan**: [plan.md](./plan.md)
+**日付**: 2026-01-28 | **計画書**: [plan.md](./plan.md)
 
-## Prerequisites
+## 前提条件
 
 - Node.js 20.x
-- Bun (package manager and test runner)
-- AWS CLI configured with valid credentials
-- AWS CDK CLI (`npm install -g aws-cdk`)
+- Bun（パッケージマネージャー兼テストランナー）
+- AWS CLIが有効な認証情報で設定済み
+- AWS CDK CLI（`npm install -g aws-cdk`）
 
-## Project Setup
+## プロジェクトセットアップ
 
 ```bash
-# From repository root
+# リポジトリルートから実行
 cd infrastructure && bun install
 cd ../backend && bun install
 cd ../frontend && bun install
 cd ../e2e && bun install
 ```
 
-## Local Development
+## ローカル開発
 
-### Backend (Lambda handlers)
+### バックエンド（Lambdaハンドラ）
 
 ```bash
 cd backend
 
-# Run unit tests (TDD: write tests first)
+# ユニットテスト実行（TDD: テストを先に書く）
 bun run test
 
-# Run lint and type check
+# lint・型チェック実行
 bun run lint
 ```
 
-### Frontend (React SPA)
+### フロントエンド（React SPA）
 
 ```bash
 cd frontend
 
-# Start dev server (Vite)
+# 開発サーバー起動（Vite）
 bun run dev
 
-# Run tests
+# テスト実行
 bun run test
 
-# Run lint and type check
+# lint・型チェック実行
 bun run lint
 
-# Build for production
+# 本番ビルド
 bun run build
 ```
 
-### E2E Tests (Playwright)
+### E2Eテスト（Playwright）
 
 ```bash
 cd e2e
 
-# Run BDD scenarios
+# BDDシナリオ実行
 bun run test
 
-# Run with UI mode
+# UIモードで実行
 bun run test:ui
 ```
 
-## Deploy to AWS
+## AWSへのデプロイ
 
 ```bash
 cd infrastructure
 
-# Synthesize CloudFormation template
+# CloudFormationテンプレートの合成
 bun run cdk synth
 
-# Deploy stack
+# スタックのデプロイ
 bun run cdk deploy
 
-# Destroy stack (cleanup)
+# スタックの削除（クリーンアップ）
 bun run cdk destroy
 ```
 
-## Architecture Overview
+## アーキテクチャ概要
 
 ```
-Browser → CloudFront
-           ├── /* → S3 (React SPA)
-           └── /api/* → API Gateway → Lambda → DynamoDB
+ブラウザ → CloudFront
+             ├── /* → S3 (React SPA)
+             └── /api/* → API Gateway → Lambda → DynamoDB
 ```
 
-## API Endpoints
+## APIエンドポイント
 
-| Method | Path | Description |
+| メソッド | パス | 説明 |
 |--------|------|-------------|
-| GET | `/api/{appId}` | Get app info (validates app exists) |
-| POST | `/api/{appId}/responses` | Submit feedback response |
-| GET | `/api/responses/csv` | Download all responses as CSV |
+| GET | `/api/{appId}` | アプリ情報取得（アプリの存在を検証） |
+| POST | `/api/{appId}/responses` | フィードバック回答の送信 |
+| GET | `/api/responses/csv` | 全回答をCSVでダウンロード |
 
-## Key Files
+## 主要ファイル
 
-| File | Purpose |
+| ファイル | 用途 |
 |------|---------|
-| `infrastructure/lib/webform-stack.ts` | CDK stack (all AWS resources) |
-| `backend/src/lib/apps-config.ts` | App registry (add apps here) |
-| `frontend/src/lib/form-definition.ts` | SurveyJS form JSON (add fields here) |
-| `frontend/src/lib/i18n.ts` | Japanese/English translations |
+| `infrastructure/lib/webform-stack.ts` | CDKスタック（全AWSリソース） |
+| `backend/src/lib/apps-config.ts` | アプリ定義（ここにアプリを追加） |
+| `frontend/src/lib/form-definition.ts` | SurveyJSフォームJSON（ここにフィールドを追加） |
+| `frontend/src/lib/i18n.ts` | 日本語/英語の翻訳 |
 
-## Adding a New App
+## 新しいアプリの追加方法
 
-Edit `backend/src/lib/apps-config.ts`:
+`backend/src/lib/apps-config.ts` を編集:
 
 ```typescript
 export const apps = {
   "app1": { name: "アプリ1", nameEn: "App 1" },
   "app2": { name: "アプリ2", nameEn: "App 2" },
-  // Add new app here:
+  // ここに新しいアプリを追加:
   "app3": { name: "新しいアプリ", nameEn: "New App" },
 };
 ```
 
-Then redeploy the backend Lambda.
+その後、バックエンドLambdaを再デプロイする。
 
-## Adding a New Form Field
+## 新しいフォームフィールドの追加方法
 
-1. Update SurveyJS form definition in `frontend/src/lib/form-definition.ts`
-2. No backend changes needed (accepts any fields)
-3. No database migration needed (DynamoDB is schemaless)
-4. CSV export automatically includes the new column
-5. Old responses show blank for the new field
+1. `frontend/src/lib/form-definition.ts` のSurveyJSフォーム定義を更新
+2. バックエンドの変更は不要（任意のフィールドを受け入れる）
+3. データベースマイグレーションは不要（DynamoDBはスキーマレス）
+4. CSVエクスポートは自動的に新しい列を含める
+5. 古い回答では新しいフィールドは空白として表示
 
-## Test Execution
+## テスト実行
 
 ```bash
-# Backend unit tests
+# バックエンドユニットテスト
 cd backend && bun run test
 
-# Frontend tests
+# フロントエンドテスト
 cd frontend && bun run test
 
-# E2E / BDD tests
+# E2E / BDDテスト
 cd e2e && bun run test
 
-# Lint (all projects)
+# lint（全プロジェクト）
 cd backend && bun run lint
 cd frontend && bun run lint
 cd infrastructure && bun run lint
