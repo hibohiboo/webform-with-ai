@@ -6,7 +6,7 @@
 
 ### App（アプリ）
 
-設定駆動のエンティティ。DynamoDBには保存せず、バックエンドコード内のJSON設定として定義する。
+設定駆動のエンティティ。DynamoDBには保存せず、**フロントエンドコード内の静的JSON設定**として定義する。バックエンドはappIdの存在を検証せず、送信された値をそのまま保存する。
 
 | フィールド | 型 | 説明 |
 |-----------|------|-------------|
@@ -14,7 +14,7 @@
 | name | string | 日本語表示名（例: "アプリ1"） |
 | nameEn | string | 英語表示名（例: "App 1"） |
 
-**保存先**: `backend/src/lib/apps-config.ts` 内のTypeScript定数
+**保存先**: `frontend/src/lib/apps-config.ts` 内のTypeScript定数
 
 ```typescript
 type AppConfig = {
@@ -162,4 +162,4 @@ AppConfig (JSON設定)            FeedbackResponse (DynamoDB)
 
 - 1つのAppに対して複数のResponseが存在する（1:N）
 - リレーションシップはアプリケーション層で管理（データベースの外部キーではない）
-- リクエスト内の無効なappId → アプリ設定の参照で404を返す
+- リクエスト内の無効なappId → フロントエンドが静的設定を参照し404ページを表示（バックエンドは検証しない）

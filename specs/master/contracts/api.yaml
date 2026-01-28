@@ -9,39 +9,6 @@ servers:
     description: API Gateway via CloudFront
 
 paths:
-  /{appId}:
-    get:
-      summary: Get app information
-      description: Returns app metadata if the appId is registered. Returns 404 for unregistered apps.
-      operationId: getApp
-      parameters:
-        - name: appId
-          in: path
-          required: true
-          schema:
-            type: string
-            pattern: "^[a-zA-Z0-9-]+$"
-          description: URL-safe app identifier (e.g., "app1")
-      responses:
-        "200":
-          description: App found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AppInfo"
-              example:
-                appId: app1
-                name: "アプリ1"
-                nameEn: "App 1"
-        "404":
-          description: App not registered
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-              example:
-                message: "App not found"
-
   /{appId}/responses:
     post:
       summary: Submit feedback response
@@ -49,7 +16,8 @@ paths:
         Submits a feedback response for the specified app.
         All fields in the request body are optional.
         An empty body is valid (submits a blank response).
-        The backend does not validate field values — any values are accepted and stored as-is.
+        The backend does not validate appId or field values — any values are accepted and stored as-is.
+        App validation is handled by the frontend before submission.
       operationId: submitResponse
       parameters:
         - name: appId
@@ -88,12 +56,6 @@ paths:
               example:
                 responseId: "01HGW2XYZ123ABC"
                 submittedAt: "2026-01-28T10:30:00.000Z"
-        "404":
-          description: App not registered
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
 
   /responses/csv:
     get:
@@ -126,26 +88,6 @@ paths:
 
 components:
   schemas:
-    AppInfo:
-      type: object
-      required:
-        - appId
-        - name
-        - nameEn
-      properties:
-        appId:
-          type: string
-          description: URL-safe app identifier
-          example: app1
-        name:
-          type: string
-          description: App display name in Japanese
-          example: "アプリ1"
-        nameEn:
-          type: string
-          description: App display name in English
-          example: "App 1"
-
     SubmitResponseBody:
       type: object
       description: |

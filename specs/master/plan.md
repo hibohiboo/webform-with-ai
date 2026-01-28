@@ -78,18 +78,15 @@ backend/
 ├── src/
 │   ├── handlers/
 │   │   ├── submit-response.ts  # POST /api/{appId}/responses
-│   │   ├── download-csv.ts     # GET /api/responses/csv
-│   │   └── get-app.ts          # GET /api/{appId}
+│   │   └── download-csv.ts     # GET /api/responses/csv
 │   ├── lib/
 │   │   ├── dynamodb.ts         # DynamoDBクライアントヘルパー
-│   │   ├── csv.ts              # BOM付きCSV生成
-│   │   └── apps-config.ts      # アプリ定義（設定駆動）
+│   │   └── csv.ts              # BOM付きCSV生成
 │   └── shared/
 │       └── types.ts            # 共有型定義
 ├── tests/
 │   ├── unit/
 │   │   ├── submit-response.test.ts
-│   │   ├── download-csv.test.ts
 │   │   └── csv.test.ts
 │   └── integration/
 │       └── api.test.ts
@@ -105,15 +102,12 @@ frontend/
 │   │   └── ThankYou.tsx        # 送信完了確認
 │   ├── lib/
 │   │   ├── api.ts              # APIクライアント
+│   │   ├── apps-config.ts      # アプリ定義（静的設定）
 │   │   ├── form-definition.ts  # データ駆動のフォーム定義JSON（共有）
 │   │   └── i18n.ts             # 日本語/英語の翻訳
-│   └── hooks/
-│       └── useApp.ts           # アプリデータ取得フック
 ├── tests/
-│   ├── components/
-│   │   └── FeedbackForm.test.tsx
-│   └── hooks/
-│       └── useApp.test.ts
+│   └── components/
+│       └── FeedbackForm.test.tsx
 ├── index.html
 ├── vite.config.ts
 ├── tsconfig.json
@@ -148,8 +142,8 @@ e2e/
 
 ### III. シンプルさ優先
 - [x] **合格**: DynamoDBシングルテーブルで直接属性を保存（EAV・ORM不使用）
-- [x] **合格**: アプリ設定はJSON定数（動的な管理画面不使用）
-- [x] **合格**: 3つのLambdaハンドラ（エンドポイントごとに1つ） — 共有フレームワーク不使用
+- [x] **合格**: アプリ設定はフロントエンドの静的JSON定数（バックエンド検証不使用）
+- [x] **合格**: 2つのLambdaハンドラ（submit-response, download-csv） — 共有フレームワーク不使用
 - [x] **合格**: 単一CDKスタック — マルチスタックやカスタムコンストラクト不使用
 - [x] **合格**: 手動CSV生成 — 不必要なライブラリ依存なし
 - [x] **合格**: CSVはLambdaから直接レスポンス（MVPではS3署名付きURL不使用）

@@ -68,29 +68,29 @@
   - S3バケット: プライベート、OACでCloudFrontからのみアクセス
   - CloudFront: errorResponsesでSPAルーティング、/api/*をAPI Gatewayに転送
 - [ ] T021 [P] `infrastructure/lib/backend-stack.ts` にLambda関数を追加（NodejsFunction + esbuild）
-  - get-app, submit-response, download-csv の3つ
+  - submit-response, download-csv の2つ
 - [ ] T022 [P] `infrastructure/lib/backend-stack.ts` にAPI Gatewayルートを追加
-  - GET /api/{appId}
   - POST /api/{appId}/responses
   - GET /api/responses/csv
 
 ### 2.2 バックエンド — 共有コード
 
-- [ ] T023 [P] `backend/src/shared/types.ts` を作成（AppConfig, FeedbackResponse型定義）
-- [ ] T024 [P] `backend/src/lib/apps-config.ts` を作成（アプリ定義のJSON設定）
-  - app1, app2 のサンプルデータを含む
-- [ ] T025 [P] `backend/src/lib/dynamodb.ts` を作成（DynamoDBクライアントヘルパー）
+- [ ] T023 [P] `backend/src/shared/types.ts` を作成（FeedbackResponse型定義）
+- [ ] T024 [P] `backend/src/lib/dynamodb.ts` を作成（DynamoDBクライアントヘルパー）
   - DynamoDBDocumentClientの初期化
   - PutItem, Scan操作のラッパー関数
 
 ### 2.3 フロントエンド — 共有コード
 
+- [ ] T025 [P] `frontend/src/lib/apps-config.ts` を作成（アプリ定義の静的JSON設定）
+  - app1, app2 のサンプルデータを含む
+  - AppConfig型定義（appId, name, nameEn）
 - [ ] T026 [P] `frontend/src/lib/form-definition.ts` を作成（SurveyJSフォーム定義JSON）
   - 名前、評価（1-3）、自由記述の3フィールド
   - 日本語/英語のローカライズ対応
 - [ ] T027 [P] `frontend/src/lib/i18n.ts` を作成（日本語/英語の翻訳設定）
 - [ ] T028 [P] `frontend/src/lib/api.ts` を作成（APIクライアント）
-  - getApp, submitResponse, downloadCsv関数
+  - submitResponse, downloadCsv関数
 
 **チェックポイント**: `bun run cdk synth` が成功し、CloudFormationテンプレートが生成されること
 
@@ -104,39 +104,34 @@
 
 ### 3.1 バックエンド実装
 
-- [ ] T029 [P] [US1] `backend/src/handlers/get-app.ts` を作成
-  - apps-config.tsからアプリ情報を取得
-  - 存在しないappIdには404を返す
-- [ ] T030 [P] [US1] `backend/src/handlers/submit-response.ts` を作成
+- [ ] T029 [P] [US1] `backend/src/handlers/submit-response.ts` を作成
   - ULIDでresponseIdを生成
   - ISO 8601形式でsubmittedAtを生成
   - DynamoDBにPutItem
-  - 201レスポンスを返す
-- [ ] T031 [US1] `backend/tests/unit/get-app.test.ts` を作成
-- [ ] T032 [US1] `backend/tests/unit/submit-response.test.ts` を作成
+  - 201レスポンスを返す（appIdの検証は行わない）
+- [ ] T030 [US1] `backend/tests/unit/submit-response.test.ts` を作成
 
 ### 3.2 フロントエンド実装
 
-- [ ] T033 [P] [US1] `frontend/src/main.tsx` を作成（エントリーポイント）
-- [ ] T034 [P] [US1] `frontend/src/App.tsx` を作成（React Router v7 createBrowserRouter）
+- [ ] T031 [P] [US1] `frontend/src/main.tsx` を作成（エントリーポイント）
+- [ ] T032 [P] [US1] `frontend/src/App.tsx` を作成（React Router v7 createBrowserRouter）
   - /:appId/form ルート
   - 404ページ
-- [ ] T035 [P] [US1] `frontend/src/hooks/useApp.ts` を作成
-  - GET /api/{appId} を呼び出してアプリ情報を取得
-  - エラー時は404状態を返す
-- [ ] T036 [US1] `frontend/src/components/FeedbackForm.tsx` を作成
+- [ ] T033 [US1] `frontend/src/components/FeedbackForm.tsx` を作成
+  - apps-config.tsからアプリ情報を取得（静的設定）
+  - 存在しないappIdの場合は404ページへリダイレクト
   - SurveyJSでフォームをレンダリング
   - onCompleteで回答をAPIに送信
   - アプリ名を動的に表示
-- [ ] T037 [US1] `frontend/src/components/ThankYou.tsx` を作成
+- [ ] T034 [US1] `frontend/src/components/ThankYou.tsx` を作成
   - 送信完了メッセージを表示
-- [ ] T038 [US1] `frontend/src/components/NotFound.tsx` を作成
+- [ ] T035 [US1] `frontend/src/components/NotFound.tsx` を作成
   - 404エラーページ
-- [ ] T039 [US1] `frontend/index.html` を作成
+- [ ] T036 [US1] `frontend/index.html` を作成
 
 ### 3.3 E2Eテスト
 
-- [ ] T040 [US1] `e2e/tests/submit-feedback.spec.ts` を作成
+- [ ] T037 [US1] `e2e/tests/submit-feedback.spec.ts` を作成
   - シナリオ1: アプリ名が表示される
   - シナリオ2: 全項目入力して送信
   - シナリオ3: 空白で送信
@@ -154,25 +149,24 @@
 
 ### 4.1 バックエンド実装
 
-- [ ] T041 [P] [US2] `backend/src/lib/csv.ts` を作成
+- [ ] T038 [P] [US2] `backend/src/lib/csv.ts` を作成
   - BOM付きUTF-8でCSV生成
   - RFC 4180エスケープ（カンマ、改行、ダブルクォート）
   - 動的カラム（全レコードの属性和集合）
-- [ ] T042 [US2] `backend/src/handlers/download-csv.ts` を作成
+- [ ] T039 [US2] `backend/src/handlers/download-csv.ts` を作成
   - DynamoDBをページネーション付きでScan
   - csv.tsでCSV生成
   - Content-Type: text/csv; charset=utf-8
   - Content-Disposition: attachment; filename="feedback.csv"
   - isBase64Encoded: true
-- [ ] T043 [US2] `backend/tests/unit/csv.test.ts` を作成
+- [ ] T040 [US2] `backend/tests/unit/csv.test.ts` を作成
   - BOMの存在確認
   - 特殊文字エスケープ
   - 動的カラム生成
-- [ ] T044 [US2] `backend/tests/unit/download-csv.test.ts` を作成
 
 ### 4.2 E2Eテスト
 
-- [ ] T045 [US2] `e2e/tests/download-csv.spec.ts` を作成
+- [ ] T041 [US2] `e2e/tests/download-csv.spec.ts` を作成
   - シナリオ1: CSVダウンロード成功
   - シナリオ2: 列構成の確認
   - シナリオ3: 未入力項目は空白
@@ -190,14 +184,14 @@
 
 ### 5.1 検証（実装は不要 — 設計時点で対応済み）
 
-- [ ] T046 [US3] スキーマ進化の動作確認
+- [ ] T042 [US3] スキーマ進化の動作確認
   - form-definition.tsに新しいフィールドを追加
   - 新しい回答を送信
   - CSVダウンロードで新しい列が含まれ、過去の回答は空白であることを確認
 
 ### 5.2 E2Eテスト
 
-- [ ] T047 [US3] `e2e/tests/schema-evolution.spec.ts` を作成
+- [ ] T043 [US3] `e2e/tests/schema-evolution.spec.ts` を作成
   - シナリオ1: 新しいフィールドの回答が記録される
   - シナリオ2: CSVに新しい列が含まれる
   - シナリオ3: 過去の回答は新しい列が空白
@@ -210,11 +204,11 @@
 
 **目的**: 複数のユーザーストーリーに影響する改善
 
-- [ ] T048 [P] `backend/tests/integration/api.test.ts` を作成（API統合テスト）
-- [ ] T049 [P] 全サブプロジェクトで `bun run lint` が通ることを確認
-- [ ] T050 [P] 全サブプロジェクトで `bun run test` が通ることを確認
-- [ ] T051 `quickstart.md` の手順を実行して動作確認
-- [ ] T052 AWSへのデプロイ（`bun run cdk deploy`）
+- [ ] T044 [P] `backend/tests/integration/api.test.ts` を作成（API統合テスト）
+- [ ] T045 [P] 全サブプロジェクトで `bun run lint` が通ることを確認
+- [ ] T046 [P] 全サブプロジェクトで `bun run test` が通ることを確認
+- [ ] T047 `quickstart.md` の手順を実行して動作確認
+- [ ] T048 AWSへのデプロイ（`bun run cdk deploy`）
 
 ---
 
@@ -258,15 +252,15 @@ Phase 6: 仕上げ
 ```
 順次: T018 → T019 → T020 (CDKスタック)
 並列: T021, T022 (Lambda, API Gateway)
-並列: T023, T024, T025 (バックエンド共有)
-並列: T026, T027, T028 (フロントエンド共有)
+並列: T023, T024 (バックエンド共有)
+並列: T025, T026, T027, T028 (フロントエンド共有)
 ```
 
 **Phase 3 内**:
 ```
-並列: T029, T030 (バックエンドハンドラ)
-並列: T033, T034, T035 (フロントエンド基盤)
-順次: T035 → T036 → T037 (フォームコンポーネント)
+T029 (バックエンドハンドラ)
+並列: T031, T032 (フロントエンド基盤)
+順次: T032 → T033 → T034 → T035 (フォームコンポーネント)
 ```
 
 ---
@@ -295,13 +289,13 @@ Phase 6: 仕上げ
 
 | 項目 | 数値 |
 |------|------|
-| 総タスク数 | 52 |
+| 総タスク数 | 48 |
 | Phase 1（セットアップ） | 17 |
 | Phase 2（基盤構築） | 11 |
-| Phase 3（US1） | 12 |
-| Phase 4（US2） | 5 |
+| Phase 3（US1） | 9 |
+| Phase 4（US2） | 4 |
 | Phase 5（US3） | 2 |
 | Phase 6（仕上げ） | 5 |
-| 並列実行可能タスク | 32 |
+| 並列実行可能タスク | 28 |
 
-**推奨MVPスコープ**: Phase 1 + Phase 2 + Phase 3（US1のみ）= 40タスク
+**推奨MVPスコープ**: Phase 1 + Phase 2 + Phase 3（US1のみ）= 37タスク

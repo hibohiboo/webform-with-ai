@@ -210,7 +210,7 @@ const apps: Record<string, AppConfig> = {
 
 **根拠:**
 - SPAアーキテクチャではフロントエンドがルーティングを処理
-- フロントエンドが `GET /api/{appId}` エンドポイントからアプリ情報を取得
+- フロントエンドが静的設定ファイル（`apps-config.ts`）からアプリ情報を取得
 - アプリが見つからない場合、APIが404を返す → フロントエンドが404ページを表示
 - CloudFrontのエラーレスポンスが、存在しないSPAルートへの直接アクセスを処理
 
@@ -218,8 +218,8 @@ const apps: Record<string, AppConfig> = {
 1. ユーザーが `/{appId}/form` にアクセス
 2. CloudFrontがindex.htmlを返す（SPA）
 3. React Router v7（createBrowserRouter）が `/:appId/form` にマッチ
-4. コンポーネントが `GET /api/{appId}` を呼び出してアプリ名を検証・取得
-5. 404の場合 → エラーページを表示。200の場合 → アプリ名付きでフォームをレンダリング
+4. コンポーネントが静的設定（`apps-config.ts`）からappIdを検索
+5. 見つからない場合 → 404ページを表示。見つかった場合 → アプリ名付きでフォームをレンダリング
 
 ---
 
