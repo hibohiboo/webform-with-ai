@@ -86,5 +86,18 @@ When new fields are added, CSV exports must include the new columns and leave bl
 
 Do not introduce authentication, admin UI, or premature optimization.
 Prioritize simplicity, clarity, and long-term maintainability.
+Write the output in Japanese.
+
+
+```
+
+# /speckit.tasks でタスク一覧を作ってもらう
+
+```
+/speckit.tasks
+Generate an MVP-focused task list based strictly on the existing plan.md and related documents.
+Group tasks by infrastructure, backend, and frontend.
+Do not introduce new features or refactorings.
+Write the output in Japanese.
 
 ```
