@@ -11,6 +11,7 @@
 
 - Q: How should apps be registered and managed in the system? → A: Apps defined in configuration file or database (managed by system administrator outside the web interface)
 - Q: How should the system handle unregistered app URLs (e.g., /app999/form)? → A: Return standard 404 error page
+- Q: How should the system validate and handle invalid rating values (e.g., 0, 4, text input)? → A: Accept any value and store as-is (UI guides to 1-3 but storage is flexible for future rating scale changes)
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -68,7 +69,6 @@
 
 - 名前や自由記述欄に特殊文字（引用符、改行、カンマなど）が含まれる場合、CSV出力時に正しくエスケープされるか？
 - 同一ユーザーが同じアプリに対して複数回回答を送信した場合、すべての回答が個別に記録されるか？
-- 評価欄に1〜3以外の値（例: 0, 4, 文字列）が送信された場合、どのように検証・処理するか？
 - 管理者用のCSVダウンロード機能に認証やアクセス制限は必要か？（初期実装では不要、将来的に追加の可能性）
 - 大量の回答データ（数千件以上）がある場合、CSVダウンロードのパフォーマンスは問題ないか？
 
@@ -81,6 +81,7 @@
 - **FR-002**: フォームページは、URLに基づいてアプリ名を特定し、ページタイトルや説明文にアプリ名を動的に表示しなければならない
 - **FR-002-A**: 登録されていないアプリのURLにアクセスした場合、システムは標準404エラーページを返さなければならない
 - **FR-003**: フォームは、名前（テキスト）、評価（1〜3の整数）、自由記述（テキストエリア）の3つの入力項目を持たなければならない
+- **FR-003-A**: 評価項目のUIは1〜3の選択を誘導するが、サーバー側は任意の値を受け入れて保存する（将来的な評価段階の変更に対応するため、厳密な検証は行わない）
 - **FR-004**: すべての入力項目は任意（optional）であり、利用者は何も入力せずに送信できなければならない
 - **FR-005**: フォームの送信ボタンを押すと、回答データ（アプリ名、名前、評価、自由記述、送信日時など）がシステムに保存されなければならない
 - **FR-006**: 管理者は、保存されたすべての回答データをCSV形式でダウンロードできなければならない
