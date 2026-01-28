@@ -101,3 +101,5 @@ Do not introduce new features or refactorings.
 Write the output in Japanese.
 
 ```
+
+# /speckit.implements で実装開始
