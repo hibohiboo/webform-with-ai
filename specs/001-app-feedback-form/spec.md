@@ -13,6 +13,7 @@
 - Q: How should the system handle unregistered app URLs (e.g., /app999/form)? → A: Return standard 404 error page
 - Q: How should the system validate and handle invalid rating values (e.g., 0, 4, text input)? → A: Accept any value and store as-is (UI guides to 1-3 but storage is flexible for future rating scale changes)
 - Q: Should the CSV download require authentication or access control for administrators? → A: No authentication for MVP; add in future phase
+- Q: What character encoding should be used for CSV file output? → A: UTF-8 with BOM (best Excel compatibility for Japanese text)
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -87,7 +88,9 @@
 - **FR-006**: 管理者は、保存されたすべての回答データをCSV形式でダウンロードできなければならない
 - **FR-006-A**: MVPでは認証・アクセス制限は実装しない（将来的なフェーズで追加予定）
 - **FR-007**: CSV出力には、回答ID、アプリ名、名前、評価、自由記述、回答日時などの列が含まれなければならない
+- **FR-007-A**: CSVファイルはUTF-8エンコーディング（BOM付き）で出力されなければならない（日本語テキストのExcel互換性を確保するため）
 - **FR-008**: 未入力の項目は、CSV出力時に空白（空セル）として表示されなければならない
+- **FR-008-A**: 名前や自由記述欄に含まれる特殊文字（引用符、改行、カンマなど）は、CSV形式の標準規則に従って適切にエスケープされなければならない
 - **FR-009**: 将来的に入力項目が追加された場合、過去の回答データについても新しい項目の列を含むCSVが出力され、該当項目が存在しない回答では空白として扱われなければならない
 - **FR-010**: システムは、利用者が送信した回答を個別のレコードとして記録しなければならない（同一ユーザーの複数回答も個別に記録）
 
