@@ -223,6 +223,31 @@ const apps: Record<string, AppConfig> = {
 
 ---
 
+## 7. 既存CDKプロジェクトからの知見
+
+### 参照元: cartagraph CDKスタック
+
+既存プロジェクト（約5年前に構築）のCDK構成を分析し、採用する規約と更新が必要なパターンを整理した。
+
+**採用する規約:**
+- `import * as s3 from 'aws-cdk-lib/aws-s3'` 形式の名前空間インポート
+- `interface Props extends core.StackProps` によるスタック引数の型定義
+- プライベートメソッドによる機能分割（`createS3`, `createCloudFront` など）
+- `core.CfnOutput` によるデプロイ後のURL出力
+- `core.Tags.of(this).add()` によるリソースのタグ付け
+- 日本語コメントでビジネスロジックを説明
+- セキュリティヘッダーの設定（HSTS, X-Content-Type-Options, X-Frame-Options など）
+
+**更新が必要な古いパターン:**
+- `OriginAccessIdentity` (OAI) → `S3BucketOrigin.withOriginAccessControl` (OAC) に移行
+- 手動バケットポリシー → OACではCDKが自動管理するため不要
+- `S3Origin` → `S3BucketOrigin` に移行
+- `DnsValidatedCertificate` → `Certificate` に移行（今回はカスタムドメイン不使用）
+- `cf.experimental.EdgeFunction` → 不要（今回はCloudFront Functionsも不使用）
+- `NODEJS_18_X` → `NODEJS_22_X` に更新（Lambda実行環境）
+
+---
+
 ## 参考資料
 
 ### DynamoDB
