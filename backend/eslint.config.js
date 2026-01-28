@@ -1,15 +1,13 @@
-import { defineConfig, globalIgnores } from "eslint/config";
 import path from "path";
 import { fileURLToPath } from "url";
 import { FlatCompat } from "@eslint/eslintrc";
 import eslint from "@eslint/js";
+import { defineConfig, globalIgnores } from "eslint/config";
 import eslintConfigPrettier from "eslint-config-prettier/flat";
 import sonarjs from "eslint-plugin-sonarjs";
 import unusedImports from "eslint-plugin-unused-imports";
-import { configs as tsEsLintConfigs } from "typescript-eslint";
-import reactHooks from "eslint-plugin-react-hooks";
-import reactRefresh from "eslint-plugin-react-refresh";
 import globals from "globals";
+import { configs as tsEsLintConfigs } from "typescript-eslint";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -37,7 +35,7 @@ const baseConfig = defineConfig([
     rules: {
       "linebreak-style": ["error", "unix"],
       semi: ["error", "always"],
-      complexity: ["error", 10], // 複雑度の設定
+      complexity: ["error", 7], // 複雑度の設定
       // The typescript-eslint FAQ provides guidance here:
       // https://typescript-eslint.io/troubleshooting/faqs/general/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
       "no-undef": "off",
@@ -94,46 +92,55 @@ const baseConfig = defineConfig([
   },
 ]);
 
-const customConfig = defineConfig([
+const customConfig = [
+  ...baseConfig,
   {
-    files: ["**/*.ts", "**/*.tsx"],
-    ignores: ["dist", "public"],
-    extends: [
-      reactHooks.configs.flat.recommended,
-      reactRefresh.configs.vite,
-      ...baseConfig,
-    ],
-    rules: {
-      "react-refresh/only-export-components": [
-        "warn",
-        { allowConstantExport: true },
-      ],
-      "no-alert": "off",
-      "no-console": "off",
-      // Redux Toolkit uses immer internally to allow "mutating" state
-      "no-param-reassign": [
-        "error",
-        { props: true, ignorePropertyModificationsFor: ["state"] },
-      ],
-      // Allow TO DO comments for future implementation
-      "sonarjs/todo-tag": "warn",
-    },
+    files: ["**/*.ts"],
+    ignores: ["dist/**", "node_modules/**", "drizzle/**"],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "module",
       globals: {
         ...globals.node,
-        ...globals.browser,
-        myCustomGlobal: "readonly",
       },
     },
+    rules: {
+      // バックエンド固有のルール
+      "no-console": "off", // サーバーログ用
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+        },
+      ],
+    },
   },
-]);
+];
 
-export default defineConfig([
-  globalIgnores(["vite.config.ts", "tests/**"]),
+export default defineConfig(
+  { ignores: ["vite.config.ts", "**/dist/**", "**/public/**"] },
   {
-    files: ["**/*.{ts,tsx}"],
-    extends: [...customConfig],
+    extends: [
+      ...customConfig,
+      {
+        files: ["eslint.config.js", "drizzle.config.ts", "vitest.config.ts"],
+        rules: {
+          "import/no-extraneous-dependencies": ["off"],
+        },
+      },
+      {
+        files: ["**/tests/**"],
+        rules: {
+          "import/no-extraneous-dependencies": ["off"],
+          "@typescript-eslint/no-explicit-any": ["off"],
+          "no-await-in-loop": ["off"],
+          "no-promise-executor-return": ["off"],
+          "no-plusplus": ["off"],
+          "no-shadow": ["off"],
+          "sonarjs/no-hardcoded-passwords": ["off"],
+        },
+      },
+    ],
   },
-]);
+);

@@ -103,3 +103,20 @@ Write the output in Japanese.
 ```
 
 # /speckit.implements で実装開始
+
+## package.jsonの更新
+claudeが準備したpackage.jsonのライブラリのバージョンが古いので更新した
+
+## lint設定
+これは個人的な好み。
+フロントエンド。
+```
+$ bun i -D @eslint/eslintrc @eslint/js eslint eslint-config-prettier eslint-import-resolver-typescript eslint-plugin-import eslint-plugin-react-hooks eslint-plugin-react-refresh  eslint-plugin-sonarjs eslint-plugin-unused-imports globals typescript-eslint
+```
+
+バックエンド
+
+```
+
+$ bun i -D @eslint/eslintrc @eslint/js eslint eslint-config-prettier eslint-import-resolver-typescript eslint-plugin-import  eslint-plugin-sonarjs eslint-plugin-unused-imports globals typescript-eslint
+```
