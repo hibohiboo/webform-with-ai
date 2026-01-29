@@ -1,4 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router";
+import AdminDownload from "./components/AdminDownload";
 import FeedbackForm from "./components/FeedbackForm";
 import NotFound from "./components/NotFound";
 import ThankYou from "./components/ThankYou";
@@ -11,6 +12,10 @@ const router = createBrowserRouter([
   {
     path: "/:appId/thank-you",
     element: <ThankYou />,
+  },
+  {
+    path: "/admin",
+    element: <AdminDownload />,
   },
   {
     path: "*",

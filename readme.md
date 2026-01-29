@@ -172,3 +172,11 @@ docker-compose up
 ```
 $ npm run local-api
 ```
+
+# E2Eテスト
+
+Playwrightブラウザをインストール
+
+```
+cd e2e && npx playwright install
+```

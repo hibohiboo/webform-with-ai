@@ -166,9 +166,8 @@ describe("API統合テスト", () => {
 
       expect(downloadResult).toMatchObject({ statusCode: 200 });
 
-      // CSVの内容を確認（Base64デコード）
-      const csvBase64 = (downloadResult as { body: string }).body;
-      const csvContent = Buffer.from(csvBase64, "base64").toString("utf-8");
+      // CSVの内容を確認（直接テキスト）
+      const csvContent = (downloadResult as { body: string }).body;
 
       expect(csvContent).toContain("responseId");
       expect(csvContent).toContain("appId");
@@ -211,8 +210,7 @@ describe("API統合テスト", () => {
 
       expect(result).toMatchObject({ statusCode: 200 });
 
-      const csvBase64 = (result as { body: string }).body;
-      const csvContent = Buffer.from(csvBase64, "base64").toString("utf-8");
+      const csvContent = (result as { body: string }).body;
 
       expect(csvContent).toContain("app1");
       expect(csvContent).toContain("app2");
@@ -254,8 +252,7 @@ describe("API統合テスト", () => {
         () => {},
       );
 
-      const csvBase64 = (result as { body: string }).body;
-      const csvContent = Buffer.from(csvBase64, "base64").toString("utf-8");
+      const csvContent = (result as { body: string }).body;
 
       // ヘッダーに両方のカスタムフィールドが含まれる
       const headerLine = csvContent.split("\r\n")[0];
@@ -325,8 +322,7 @@ describe("API統合テスト", () => {
         () => {},
       );
 
-      const csvBase64 = (result as { body: string }).body;
-      const csvContent = Buffer.from(csvBase64, "base64").toString("utf-8");
+      const csvContent = (result as { body: string }).body;
 
       // 両方のページのデータが含まれる
       expect(csvContent).toContain("ページ1ユーザー");

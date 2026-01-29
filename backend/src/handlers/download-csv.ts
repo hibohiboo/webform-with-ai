@@ -21,7 +21,7 @@ export const handler: APIGatewayProxyHandler = async () => {
 
     const csv = generateCsv(responses);
 
-    // Base64 エンコードして返す（バイナリレスポンス）
+    // CSVをテキストとして直接返す
     const result: APIGatewayProxyResult = {
       statusCode: 200,
       headers: {
@@ -29,8 +29,8 @@ export const handler: APIGatewayProxyHandler = async () => {
         "Content-Disposition": 'attachment; filename="feedback.csv"',
         "Access-Control-Allow-Origin": "*",
       },
-      body: Buffer.from(csv, "utf-8").toString("base64"),
-      isBase64Encoded: true,
+      body: csv,
+      isBase64Encoded: false,
     };
     return result;
   } catch (error) {
