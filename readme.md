@@ -147,15 +147,15 @@ https://kiuzitkug5.execute-api.ap-northeast-1.amazonaws.com/prod/api/responses/c
 
 https://d3nw9s12usdo3l.cloudfront.net/api/responses/csv
 
-# フロントエンド動作確認(開発)
+## フロントエンド動作確認(開発)
 
 http://localhost:5173/app1/form
 
-# 動作確認
+## 動作確認
 
 https://d3nw9s12usdo3l.cloudfront.net/app1/form
 
-# バックエンド動作確認 (開発)
+## バックエンド動作確認 (開発)
 
 ```
 winget install -e --id Amazon.SAM-CLI
@@ -173,7 +173,7 @@ docker-compose up
 $ npm run local-api
 ```
 
-# E2Eテスト
+## E2Eテスト
 
 Playwrightブラウザをインストール
 
@@ -181,6 +181,67 @@ Playwrightブラウザをインストール
 cd e2e && npx playwright install
 ```
 
-# CSVダウンロード
+## CSVダウンロード
 
 https://d3nw9s12usdo3l.cloudfront.net/admin
+
+# CSVを期間を指定して落とせるようにする
+
+## apec-kit から追加
+
+プロンプト
+
+```
+spec-kit add
+CSV ダウンロード API に日付範囲による絞り込みを追加したい
+
+クエリパラメータ from と to を追加
+
+フォーマットは YYYY-MM-DD
+
+from はその日の 00:00:00 から
+
+to はその日の 23:59:59.999 までを含める
+
+to=2026-01-03 の場合、2026-01-03 の最終時刻までのデータを必ず含める
+
+CSV の内容はこの期間条件でフィルタされる
+
+パラメータ未指定時は従来通り全件
+```
+
+## フロントエンドのことを言及していなかったので /speckit.clarify で修正
+
+```
+/speckit.clarify
+フロントエンドでの日付範囲入力について仕様を明確化したい。
+
+- CSV ダウンロード画面に「開始日」「終了日」の入力欄を追加する
+- 入力形式は YYYY-MM-DD
+- フロントエンドでは未指定を許容しない (APIは未指定時は従来通り全件対象)
+- 開始日 > 終了日の場合はエラー表示する
+- フロントエンドで基本的な入力バリデーションを行う
+- バックエンド側でも同様のバリデーションを行う（二重防御）
+- 入力された日付は UTC として扱う
+- 開始日または終了日が未入力の場合、CSV ダウンロード操作自体を無効化する
+- バリデーションエラー時は、API リクエストは送信しない
+
+UI 挙動とエラーメッセージの責務分担を明確にしたい。
+
+```
+
+## /speckit.plan で期間追加計画を立てる
+
+```
+/speckit.plan
+この仕様に基づいて実装計画を作成してください。
+
+- 既存の CSV ダウンロード API に対する変更点を明確にする
+- クエリパラメータ from / to のパースとバリデーション
+- 日付を UTC の開始時刻 / 終端時刻に変換する処理
+- DB クエリへの反映方法
+- 既存機能への影響点（後方互換性）
+- テスト観点（境界日・片側指定・未指定）
+
+段階的なタスク分解（実装順）で提示してください。
+```
