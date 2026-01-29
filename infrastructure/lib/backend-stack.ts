@@ -87,8 +87,10 @@ export class BackendStack extends Stack {
       },
     });
 
+    const apiRoot = api.root.addResource("api");
+
     // POST /api/{appId}/responses
-    const appIdResource = api.root.addResource("{appId}");
+    const appIdResource = apiRoot.addResource("{appId}");
     const responsesResource = appIdResource.addResource("responses");
     responsesResource.addMethod(
       "POST",
@@ -96,7 +98,7 @@ export class BackendStack extends Stack {
     );
 
     // GET /api/responses/csv
-    const responsesRootResource = api.root.addResource("responses");
+    const responsesRootResource = apiRoot.addResource("responses");
     const csvResource = responsesRootResource.addResource("csv");
     csvResource.addMethod("GET", new LambdaIntegration(downloadCsvFn));
 

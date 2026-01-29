@@ -137,3 +137,12 @@ npm run synth
 aws login
 npm run deploy
 ```
+
+フロントエンドデプロイ確認
+
+https://d3nw9s12usdo3l.cloudfront.net/
+
+バックエンドデプロイ確認
+https://kiuzitkug5.execute-api.ap-northeast-1.amazonaws.com/prod/api/responses/csv
+
+https://d3nw9s12usdo3l.cloudfront.net/api/responses/csv
