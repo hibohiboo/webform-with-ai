@@ -9,7 +9,7 @@
     "build:layer": "npx ts-node scripts/build-layer.ts",
     "presynth": "npm run build:layer",
     "synth": "cdk synth",
-    "predeploy": "npm run build:layer",
+    "predeploy": "npm run build:layer && cd ../frontend && bun run build",
     "deploy": "cdk deploy --all",
     "destroy": "cdk destroy --all",
     "lint": "eslint ."
