@@ -59,25 +59,26 @@
 
 ### 2.1 インフラストラクチャ — CDKスタック
 
-- [ ] T018 `infrastructure/bin/app.ts` を作成（CDKアプリのエントリーポイント）
-- [ ] T019 `infrastructure/lib/backend-stack.ts` を作成（API Gateway, Lambda, DynamoDB）
+- [x] T018 `infrastructure/bin/app.ts` を作成（CDKアプリのエントリーポイント）
+- [x] T019 `infrastructure/lib/backend-stack.ts` を作成（API Gateway, Lambda, DynamoDB）
   - DynamoDBテーブル: WebformResponses（PK, SK, GSI: AppIdIndex）
   - 課金方式: PROVISIONED（無料枠対応）
   - ポイントインタイムリカバリ: 無効（コスト削減のため）
   - Lambdaランタイム: NODEJS_24_X
-- [ ] T020 `infrastructure/lib/frontend-stack.ts` を作成（S3, CloudFront）
+  - Lambda Layer: ulid を共有依存関係として配置
+- [x] T020 `infrastructure/lib/frontend-stack.ts` を作成（S3, CloudFront）
   - S3バケット: プライベート、OACでCloudFrontからのみアクセス
   - CloudFront: errorResponsesでSPAルーティング、/api/*をAPI Gatewayに転送
-- [ ] T021 [P] `infrastructure/lib/backend-stack.ts` にLambda関数を追加（NodejsFunction + esbuild）
+- [x] T021 [P] `infrastructure/lib/backend-stack.ts` にLambda関数を追加（NodejsFunction + esbuild）
   - submit-response, download-csv の2つ
-- [ ] T022 [P] `infrastructure/lib/backend-stack.ts` にAPI Gatewayルートを追加
+- [x] T022 [P] `infrastructure/lib/backend-stack.ts` にAPI Gatewayルートを追加
   - POST /api/{appId}/responses
   - GET /api/responses/csv
 
 ### 2.2 バックエンド — 共有コード
 
-- [ ] T023 [P] `backend/src/shared/types.ts` を作成（FeedbackResponse型定義）
-- [ ] T024 [P] `backend/src/lib/dynamodb.ts` を作成（DynamoDBクライアントヘルパー）
+- [x] T023 [P] `backend/src/shared/types.ts` を作成（FeedbackResponse型定義）
+- [x] T024 [P] `backend/src/lib/dynamodb.ts` を作成（DynamoDBクライアントヘルパー）
   - DynamoDBDocumentClientの初期化
   - PutItem, Scan操作のラッパー関数
 
@@ -105,7 +106,7 @@
 
 ### 3.1 バックエンド実装
 
-- [ ] T029 [P] [US1] `backend/src/handlers/submit-response.ts` を作成
+- [x] T029 [P] [US1] `backend/src/handlers/submit-response.ts` を作成
   - ULIDでresponseIdを生成
   - ISO 8601形式でsubmittedAtを生成
   - DynamoDBにPutItem
@@ -150,11 +151,11 @@
 
 ### 4.1 バックエンド実装
 
-- [ ] T038 [P] [US2] `backend/src/lib/csv.ts` を作成
+- [x] T038 [P] [US2] `backend/src/lib/csv.ts` を作成
   - BOM付きUTF-8でCSV生成
   - RFC 4180エスケープ（カンマ、改行、ダブルクォート）
   - 動的カラム（全レコードの属性和集合）
-- [ ] T039 [US2] `backend/src/handlers/download-csv.ts` を作成
+- [x] T039 [US2] `backend/src/handlers/download-csv.ts` を作成
   - DynamoDBをページネーション付きでScan
   - csv.tsでCSV生成
   - Content-Type: text/csv; charset=utf-8
