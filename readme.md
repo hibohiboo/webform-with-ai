@@ -160,3 +160,15 @@ https://d3nw9s12usdo3l.cloudfront.net/app1/form
 ```
 winget install -e --id Amazon.SAM-CLI
 ```
+
+ローカルのDynamodbの起動
+
+```
+docker-compose up
+```
+
+ローカルのAPIGatewayの起動
+
+```
+$ npm run local-api
+```
