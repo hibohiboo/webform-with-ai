@@ -19,11 +19,11 @@ aws dynamodb create-table \
   --region ap-northeast-1 \
   --table-name dev-demo-SampleTable-WebformResponses \
   --attribute-definitions \
-    AttributeName=pk,AttributeType=S \
-    AttributeName=sk,AttributeType=S \
+    AttributeName=PK,AttributeType=S \
+    AttributeName=SK,AttributeType=S \
   --key-schema \
-    AttributeName=pk,KeyType=HASH \
-    AttributeName=sk,KeyType=RANGE \
+    AttributeName=PK,KeyType=HASH \
+    AttributeName=SK,KeyType=RANGE \
   --billing-mode PAY_PER_REQUEST \
   --endpoint-url http://dynamodb:8000 || true
 
