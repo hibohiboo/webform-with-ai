@@ -3,9 +3,24 @@ import { test, expect } from "@playwright/test";
 /**
  * フォーム送信のE2Eテスト
  * 目的: アプリ利用者がフォームから感想を送信できることを検証
+ *
+ * 注意: これらのテストはフロントエンド + バックエンドAPI + DynamoDB の
+ * 統合環境が必要です。デプロイ後に実行してください。
+ *
+ * 実行方法:
+ *   npx playwright test submit-feedback.spec.ts
+ *
+ * スキップする場合:
+ *   SKIP_E2E=true npx playwright test
  */
 
 test.describe("US1: フォーム送信", () => {
+  // 環境が準備できていない場合はスキップ
+  test.skip(
+    ({ browserName }) => browserName === "chromium" && !process.env.RUN_E2E,
+    "E2E環境が準備できていません。RUN_E2E=true で実行してください"
+  );
+
   test.describe("シナリオ1: アプリ名が表示される", () => {
     test("app1のフォームページでアプリ名が表示される", async ({ page }) => {
       await page.goto("/app1/form");

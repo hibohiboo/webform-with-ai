@@ -4,12 +4,20 @@ import { test, expect } from "@playwright/test";
  * スキーマ進化のE2Eテスト
  * 目的: 将来の項目追加に対応したデータモデルの検証
  *
- * 前提条件:
- * - バックエンドAPIが起動していること
- * - DynamoDBテーブルが存在すること
+ * 注意: これらのテストはフロントエンド + バックエンドAPI + DynamoDB の
+ * 統合環境が必要です。デプロイ後に実行してください。
+ *
+ * 実行方法:
+ *   RUN_E2E=true npx playwright test schema-evolution.spec.ts
  */
 
 test.describe("US3: スキーマ進化", () => {
+  // 環境が準備できていない場合はスキップ
+  test.skip(
+    ({ browserName }) => browserName === "chromium" && !process.env.RUN_E2E,
+    "E2E環境が準備できていません。RUN_E2E=true で実行してください"
+  );
+
   test.describe("シナリオ1: 新しいフィールドの回答が記録される", () => {
     test("フォームに新しいフィールドを追加して送信できる", async ({
       page,
@@ -43,7 +51,6 @@ test.describe("US3: スキーマ進化", () => {
 
   test.describe("シナリオ2: CSVに新しい列が含まれる", () => {
     test("CSVダウンロードで動的に生成された列が含まれる", async ({
-      page,
       request,
     }) => {
       // APIから直接CSVをダウンロード
@@ -122,6 +129,12 @@ test.describe("US3: スキーマ進化", () => {
 });
 
 test.describe("US3: 動的カラム生成の検証", () => {
+  // 環境が準備できていない場合はスキップ
+  test.skip(
+    ({ browserName }) => browserName === "chromium" && !process.env.RUN_E2E,
+    "E2E環境が準備できていません。RUN_E2E=true で実行してください"
+  );
+
   test("レスポンスに含まれるすべての属性がCSVの列になる", async ({
     request,
   }) => {

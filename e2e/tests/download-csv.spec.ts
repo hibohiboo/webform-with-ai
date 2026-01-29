@@ -3,9 +3,21 @@ import { test, expect } from "@playwright/test";
 /**
  * CSVダウンロードのE2Eテスト
  * 目的: 管理者が回答データをCSVでダウンロードできることを検証
+ *
+ * 注意: これらのテストはバックエンドAPI + DynamoDB の統合環境が必要です。
+ * デプロイ後に実行してください。
+ *
+ * 実行方法:
+ *   RUN_E2E=true npx playwright test download-csv.spec.ts
  */
 
 test.describe("US2: CSVダウンロード", () => {
+  // 環境が準備できていない場合はスキップ
+  test.skip(
+    ({ browserName }) => browserName === "chromium" && !process.env.RUN_E2E,
+    "E2E環境が準備できていません。RUN_E2E=true で実行してください"
+  );
+
   test.describe("シナリオ1: CSVダウンロード成功", () => {
     test("APIエンドポイントからCSVをダウンロードできる", async ({
       request,
