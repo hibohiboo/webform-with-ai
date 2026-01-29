@@ -1,0 +1,8 @@
+{
+  "name": "webform-lambda-layer",
+  "version": "1.0.0",
+  "description": "Lambda layer dependencies",
+  "dependencies": {
+    "ulid": "^2.3.0"
+  }
+}

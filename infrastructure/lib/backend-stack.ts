@@ -3,8 +3,9 @@ import { Construct } from "constructs";
 import { Table, AttributeType, BillingMode } from "aws-cdk-lib/aws-dynamodb";
 import { RestApi, LambdaIntegration, Cors } from "aws-cdk-lib/aws-apigateway";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
-import { Runtime } from "aws-cdk-lib/aws-lambda";
+import { Runtime, LayerVersion, Code } from "aws-cdk-lib/aws-lambda";
 import path from "path";
+import { externalModules } from "../constants/lambda-layer";
 
 export class BackendStack extends Stack {
   public readonly apiEndpoint: string;
@@ -29,6 +30,13 @@ export class BackendStack extends Stack {
       sortKey: { name: "submittedAt", type: AttributeType.STRING },
     });
 
+    // Lambda Layer（共有依存関係）
+    const depsLayer = new LayerVersion(this, "DepsLayer", {
+      code: Code.fromAsset(path.join(__dirname, "../layers/deps")),
+      compatibleRuntimes: [Runtime.NODEJS_24_X],
+      description: "Shared dependencies for Lambda functions (ulid)",
+    });
+
     // Lambda: submit-response
     const submitResponseFn = new NodejsFunction(this, "SubmitResponseFn", {
       functionName: "webform-submit-response",
@@ -41,9 +49,11 @@ export class BackendStack extends Stack {
       environment: {
         TABLE_NAME: table.tableName,
       },
+      layers: [depsLayer],
       bundling: {
         minify: true,
         sourceMap: true,
+        externalModules,
       },
     });
     table.grantWriteData(submitResponseFn);
@@ -57,9 +67,11 @@ export class BackendStack extends Stack {
       environment: {
         TABLE_NAME: table.tableName,
       },
+      layers: [depsLayer],
       bundling: {
         minify: true,
         sourceMap: true,
+        externalModules,
       },
     });
     table.grantReadData(downloadCsvFn);
