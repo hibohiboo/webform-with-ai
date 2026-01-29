@@ -118,6 +118,8 @@
 - [x] T031 [P] [US1] `frontend/src/main.tsx` を作成（エントリーポイント）
 - [x] T032 [P] [US1] `frontend/src/App.tsx` を作成（React Router v7 createBrowserRouter）
   - /:appId/form ルート
+  - /:appId/thank-you ルート
+  - /admin ルート（CSVダウンロード）
   - 404ページ
 - [x] T033 [US1] `frontend/src/components/FeedbackForm.tsx` を作成
   - apps-config.tsからアプリ情報を取得（静的設定）
@@ -160,13 +162,19 @@
   - csv.tsでCSV生成
   - Content-Type: text/csv; charset=utf-8
   - Content-Disposition: attachment; filename="feedback.csv"
-  - isBase64Encoded: true
+  - isBase64Encoded: false（テキストとして直接返す）
 - [x] T040 [US2] `backend/tests/unit/csv.test.ts` を作成
   - BOMの存在確認
   - 特殊文字エスケープ
   - 動的カラム生成
 
-### 4.2 E2Eテスト
+### 4.2 フロントエンド実装
+
+- [x] T040a [US2] `frontend/src/components/AdminDownload.tsx` を作成
+  - /admin ルートでCSVダウンロードページを表示
+  - ダウンロードボタン、ローディング表示、エラーハンドリング
+
+### 4.3 E2Eテスト
 
 - [ ] T041 [US2] `e2e/tests/download-csv.spec.ts` を作成 ※テストコード作成済み、デプロイ後に実行
   - シナリオ1: CSVダウンロード成功
@@ -210,7 +218,9 @@
 - [x] T045 [P] 全サブプロジェクトで `bun run lint` が通ることを確認
 - [x] T046 [P] 全サブプロジェクトで `bun run test` が通ることを確認
 - [ ] T047 `quickstart.md` の手順を実行して動作確認
-- [ ] T048 AWSへのデプロイ（`npm run cdk deploy`）※infrastructure は npm を使用
+- [x] T048 AWSへのデプロイ（`npm run cdk deploy`）※infrastructure は npm を使用
+  - フロントエンド: https://d3nw9s12usdo3l.cloudfront.net/
+  - 管理画面: https://d3nw9s12usdo3l.cloudfront.net/admin
 
 ---
 
@@ -291,13 +301,23 @@ T029 (バックエンドハンドラ)
 
 | 項目 | 数値 |
 |------|------|
-| 総タスク数 | 48 |
+| 総タスク数 | 49 |
 | Phase 1（セットアップ） | 17 |
 | Phase 2（基盤構築） | 11 |
 | Phase 3（US1） | 9 |
-| Phase 4（US2） | 4 |
+| Phase 4（US2） | 5 |
 | Phase 5（US3） | 2 |
 | Phase 6（仕上げ） | 5 |
 | 並列実行可能タスク | 28 |
 
 **推奨MVPスコープ**: Phase 1 + Phase 2 + Phase 3（US1のみ）= 37タスク
+
+---
+
+## 実装メモ
+
+### 追加実装（計画外）
+- `/admin` ルート: CSVダウンロード用の管理画面を追加（T040a）
+
+### 修正事項
+- T039: `isBase64Encoded: true` → `false` に変更（API Gateway経由でbase64デコードされない問題を修正）
