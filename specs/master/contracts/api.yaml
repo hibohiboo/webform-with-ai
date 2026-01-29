@@ -1,0 +1,135 @@
+openapi: 3.0.3
+info:
+  title: Webform Feedback API
+  description: API for collecting and exporting user feedback across multiple applications
+  version: 1.0.0
+
+servers:
+  - url: /api
+    description: API Gateway via CloudFront
+
+paths:
+  /{appId}/responses:
+    post:
+      summary: Submit feedback response
+      description: |
+        Submits a feedback response for the specified app.
+        All fields in the request body are optional.
+        An empty body is valid (submits a blank response).
+        The backend does not validate appId or field values — any values are accepted and stored as-is.
+        App validation is handled by the frontend before submission.
+      operationId: submitResponse
+      parameters:
+        - name: appId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^[a-zA-Z0-9-]+$"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitResponseBody"
+            examples:
+              fullResponse:
+                summary: All fields filled
+                value:
+                  name: "山田太郎"
+                  rating: 2
+                  comment: "使いやすかった"
+              emptyResponse:
+                summary: Empty submission
+                value: {}
+              partialResponse:
+                summary: Only rating
+                value:
+                  rating: 3
+      responses:
+        "201":
+          description: Response submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmitResponseResult"
+              example:
+                responseId: "01HGW2XYZ123ABC"
+                submittedAt: "2026-01-28T10:30:00.000Z"
+
+  /responses/csv:
+    get:
+      summary: Download all responses as CSV
+      description: |
+        Returns all feedback responses across all apps as a CSV file.
+        The CSV uses UTF-8 encoding with BOM for Excel compatibility.
+        Columns include all fields that exist in any response.
+        Missing fields in older responses appear as empty cells.
+        No authentication required (MVP).
+      operationId: downloadCsv
+      responses:
+        "200":
+          description: CSV file download
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+              example: 'attachment; filename="feedback.csv"'
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+              example: |
+                responseId,appId,submittedAt,comment,name,rating
+                01HGW2XYZ123ABC,app1,2026-01-28T10:30:00.000Z,使いやすかった,山田太郎,2
+        "204":
+          description: No responses exist yet
+
+components:
+  schemas:
+    SubmitResponseBody:
+      type: object
+      description: |
+        Feedback response fields. All properties are optional.
+        Additional properties are accepted for schema evolution.
+      properties:
+        name:
+          type: string
+          description: Respondent name
+          example: "山田太郎"
+        rating:
+          type: number
+          description: Rating value (UI guides 1-3, but any value accepted)
+          example: 2
+        comment:
+          type: string
+          description: Free-text comment
+          example: "使いやすかった"
+      additionalProperties: true
+
+    SubmitResponseResult:
+      type: object
+      required:
+        - responseId
+        - submittedAt
+      properties:
+        responseId:
+          type: string
+          description: Generated unique response ID (ULID)
+          example: "01HGW2XYZ123ABC"
+        submittedAt:
+          type: string
+          format: date-time
+          description: Server-generated submission timestamp (ISO 8601 UTC)
+          example: "2026-01-28T10:30:00.000Z"
+
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Error description
+          example: "App not found"

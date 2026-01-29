@@ -1,0 +1,30 @@
+{
+  "name": "webform-infrastructure",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk",
+    "build:layer": "npx ts-node scripts/build-layer.ts",
+    "presynth": "npm run build:layer",
+    "synth": "cdk synth",
+    "predeploy": "npm run build:layer && cd ../frontend && bun run build",
+    "deploy": "cdk deploy --all",
+    "destroy": "cdk destroy --all",
+    "prelocal-api": "npm run synth",
+    "local-api": "sam local start-api -t ./cdk.out/WebformBackendStack.template.json --env-vars locals.json",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^25.1.0",
+    "aws-cdk": "^2.1104.0",
+    "aws-cdk-lib": "^2.236.0",
+    "constructs": "^10.4.5",
+    "esbuild": "^0.27.2",
+    "fs-extra": "^11.3.3",
+    "source-map-support": "^0.5.21",
+    "typescript": "~5.9.3"
+  }
+}

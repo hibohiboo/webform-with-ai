@@ -1,0 +1,14 @@
+{
+  "name": "webform-e2e",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test": "RUN_E2E=true playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.0",
+    "@types/node": "^25.1.0"
+  }
+}
