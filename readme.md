@@ -180,3 +180,7 @@ Playwrightブラウザをインストール
 ```
 cd e2e && npx playwright install
 ```
+
+# CSVダウンロード
+
+https://d3nw9s12usdo3l.cloudfront.net/admin
