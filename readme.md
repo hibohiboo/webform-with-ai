@@ -150,3 +150,7 @@ https://d3nw9s12usdo3l.cloudfront.net/api/responses/csv
 # フロントエンド動作確認(開発)
 
 http://localhost:5173/app1/form
+
+# 動作確認
+
+https://d3nw9s12usdo3l.cloudfront.net/app1/form
