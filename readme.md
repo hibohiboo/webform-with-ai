@@ -1,4 +1,5 @@
 # spec-kitの導入。
+
 ```bash
 uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
 ```
@@ -14,7 +15,9 @@ specify checkの結果。 ready
 ![](image/check.png)
 
 # claude で作業開始
+
 今回はpowershellで起動
+
 ```
 claude
 ```
@@ -50,12 +53,13 @@ claude
 将来的に入力項目が追加される可能性がある。
 その場合、過去の回答データについても、
 追加された項目の列を含んだCSVを出力し、
-当時存在しなかった項目については空白として扱われること。 
+当時存在しなかった項目については空白として扱われること。
 ```
 
 # clarifyへの回答(追加で説明した部分)
+
 ```
-A - 評価は 任意項目.現在は 1〜3 だが、将来 4 段階以上に変わる可能性がある.厳密なバリデーションより データ収集の柔軟性を優先したい.UI は誘導するが、保存時は縛らない 
+A - 評価は 任意項目.現在は 1〜3 だが、将来 4 段階以上に変わる可能性がある.厳密なバリデーションより データ収集の柔軟性を優先したい.UI は誘導するが、保存時は縛らない
 ```
 
 # speckit.planで計画を立ててもらう
@@ -105,11 +109,14 @@ Write the output in Japanese.
 # /speckit.implements で実装開始
 
 ## package.jsonの更新
+
 claudeが準備したpackage.jsonのライブラリのバージョンが古いので更新した
 
 ## lint設定
+
 これは個人的な好み。
 フロントエンド。
+
 ```
 $ bun i -D @eslint/eslintrc @eslint/js eslint eslint-config-prettier eslint-import-resolver-typescript eslint-plugin-import eslint-plugin-react-hooks eslint-plugin-react-refresh  eslint-plugin-sonarjs eslint-plugin-unused-imports globals typescript-eslint
 ```
@@ -119,4 +126,14 @@ $ bun i -D @eslint/eslintrc @eslint/js eslint eslint-config-prettier eslint-impo
 ```
 
 $ bun i -D @eslint/eslintrc @eslint/js eslint eslint-config-prettier eslint-import-resolver-typescript eslint-plugin-import  eslint-plugin-sonarjs eslint-plugin-unused-imports globals typescript-eslint
+```
+
+## CDK動作確認
+
+infrastructureディレクトリで下記。
+
+```
+npm run synth
+aws login
+npm run deploy
 ```
