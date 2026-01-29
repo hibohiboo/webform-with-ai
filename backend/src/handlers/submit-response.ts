@@ -1,4 +1,3 @@
-import type { APIGatewayProxyHandler } from "aws-lambda";
 import { ulid } from "ulid";
 import { putResponse } from "../lib/dynamodb";
 import type {
@@ -6,6 +5,7 @@ import type {
   SubmitResponseBody,
   SubmitResponseResult,
 } from "../shared/types";
+import type { APIGatewayProxyHandler } from "aws-lambda";
 
 const CORS_HEADERS = {
   "Content-Type": "application/json",

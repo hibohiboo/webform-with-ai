@@ -1,4 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { handler as downloadCsvHandler } from "../../src/handlers/download-csv";
+import { handler as submitHandler } from "../../src/handlers/submit-response";
 import type { APIGatewayProxyEvent, Context } from "aws-lambda";
 
 /**
@@ -7,21 +9,43 @@ import type { APIGatewayProxyEvent, Context } from "aws-lambda";
  * 実際のDynamoDBはモックを使用
  */
 
-// DynamoDBクライアントをモック
-const mockSend = vi.fn();
-vi.mock("@aws-sdk/lib-dynamodb", () => ({
-  DynamoDBDocumentClient: {
-    from: vi.fn(() => ({
-      send: mockSend,
-    })),
-  },
-  PutCommand: vi.fn((params) => ({ input: params, type: "Put" })),
-  ScanCommand: vi.fn((params) => ({ input: params, type: "Scan" })),
+// mockSend を vi.hoisted で宣言
+const { mockSend } = vi.hoisted(() => ({
+  mockSend: vi.fn(),
 }));
 
-vi.mock("@aws-sdk/client-dynamodb", () => ({
-  DynamoDBClient: vi.fn(() => ({})),
-}));
+// DynamoDBクライアントをモック
+vi.mock("@aws-sdk/lib-dynamodb", () => {
+  return {
+    DynamoDBDocumentClient: {
+      from: vi.fn(() => ({
+        send: mockSend,
+      })),
+    },
+    PutCommand: class PutCommand {
+      input: Record<string, unknown>;
+      type = "Put";
+      constructor(params: Record<string, unknown>) {
+        this.input = params;
+      }
+    },
+    ScanCommand: class ScanCommand {
+      input: Record<string, unknown>;
+      type = "Scan";
+      constructor(params: Record<string, unknown>) {
+        this.input = params;
+      }
+    },
+  };
+});
+
+vi.mock("@aws-sdk/client-dynamodb", () => {
+  return {
+    DynamoDBClient: class DynamoDBClient {
+      constructor() {}
+    },
+  };
+});
 
 vi.mock("ulid", () => ({
   ulid: vi.fn(() => "01ARZ3NDEKTSV4RRFFQ69G5FAV"),
@@ -31,8 +55,6 @@ vi.mock("ulid", () => ({
 process.env.TABLE_NAME = "TestTable";
 
 // ハンドラーをインポート
-import { handler as submitHandler } from "../../src/handlers/submit-response";
-import { handler as downloadCsvHandler } from "../../src/handlers/download-csv";
 
 const mockContext: Context = {
   callbackWaitsForEmptyEventLoop: false,
@@ -51,7 +73,7 @@ const mockContext: Context = {
 
 const createSubmitEvent = (
   appId: string,
-  body: Record<string, unknown> | null
+  body: Record<string, unknown> | null,
 ): APIGatewayProxyEvent => ({
   httpMethod: "POST",
   path: `/api/${appId}/responses`,
@@ -100,7 +122,11 @@ describe("API統合テスト", () => {
         comment: "テストコメント",
       });
 
-      const submitResult = await submitHandler(submitEvent, mockContext, () => {});
+      const submitResult = await submitHandler(
+        submitEvent,
+        mockContext,
+        () => {},
+      );
       expect(submitResult).toMatchObject({ statusCode: 201 });
 
       // PutCommandが呼ばれたことを確認
@@ -132,7 +158,11 @@ describe("API統合テスト", () => {
       });
 
       const downloadEvent = createDownloadCsvEvent();
-      const downloadResult = await downloadCsvHandler(downloadEvent, mockContext, () => {});
+      const downloadResult = await downloadCsvHandler(
+        downloadEvent,
+        mockContext,
+        () => {},
+      );
 
       expect(downloadResult).toMatchObject({ statusCode: 200 });
 
@@ -173,7 +203,11 @@ describe("API統合テスト", () => {
       });
 
       const downloadEvent = createDownloadCsvEvent();
-      const result = await downloadCsvHandler(downloadEvent, mockContext, () => {});
+      const result = await downloadCsvHandler(
+        downloadEvent,
+        mockContext,
+        () => {},
+      );
 
       expect(result).toMatchObject({ statusCode: 200 });
 
@@ -214,7 +248,11 @@ describe("API統合テスト", () => {
       });
 
       const downloadEvent = createDownloadCsvEvent();
-      const result = await downloadCsvHandler(downloadEvent, mockContext, () => {});
+      const result = await downloadCsvHandler(
+        downloadEvent,
+        mockContext,
+        () => {},
+      );
 
       const csvBase64 = (result as { body: string }).body;
       const csvContent = Buffer.from(csvBase64, "base64").toString("utf-8");
@@ -238,7 +276,11 @@ describe("API統合テスト", () => {
       });
 
       const downloadEvent = createDownloadCsvEvent();
-      const result = await downloadCsvHandler(downloadEvent, mockContext, () => {});
+      const result = await downloadCsvHandler(
+        downloadEvent,
+        mockContext,
+        () => {},
+      );
 
       expect(result).toMatchObject({ statusCode: 204 });
     });
@@ -277,7 +319,11 @@ describe("API統合テスト", () => {
       });
 
       const downloadEvent = createDownloadCsvEvent();
-      const result = await downloadCsvHandler(downloadEvent, mockContext, () => {});
+      const result = await downloadCsvHandler(
+        downloadEvent,
+        mockContext,
+        () => {},
+      );
 
       const csvBase64 = (result as { body: string }).body;
       const csvContent = Buffer.from(csvBase64, "base64").toString("utf-8");

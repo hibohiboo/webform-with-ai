@@ -1,4 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+// モジュールをインポート
+import { handler } from "../../src/handlers/submit-response";
+import { putResponse } from "../../src/lib/dynamodb";
 import type { APIGatewayProxyEvent, Context } from "aws-lambda";
 
 // モックを定義
@@ -10,10 +13,6 @@ vi.mock("../../src/lib/dynamodb", () => ({
   putResponse: vi.fn(),
 }));
 
-// モジュールをインポート
-import { handler } from "../../src/handlers/submit-response";
-import { putResponse } from "../../src/lib/dynamodb";
-
 const mockPutResponse = vi.mocked(putResponse);
 
 describe("submit-response handler", () => {
@@ -24,7 +23,7 @@ describe("submit-response handler", () => {
   });
 
   const createEvent = (
-    overrides: Partial<APIGatewayProxyEvent> = {}
+    overrides: Partial<APIGatewayProxyEvent> = {},
   ): APIGatewayProxyEvent => ({
     httpMethod: "POST",
     path: "/api/app1/responses",
@@ -108,7 +107,7 @@ describe("submit-response handler", () => {
           rating: 3,
           comment: "とても良いです",
           appId: "app1",
-        })
+        }),
       );
     });
 
@@ -128,7 +127,7 @@ describe("submit-response handler", () => {
         expect.objectContaining({
           customField: "カスタム値",
           anotherField: 123,
-        })
+        }),
       );
     });
 
@@ -144,7 +143,7 @@ describe("submit-response handler", () => {
         expect.objectContaining({
           appId: "app2",
           SK: "app2#2024-01-15T10:30:00.000Z",
-        })
+        }),
       );
     });
   });
