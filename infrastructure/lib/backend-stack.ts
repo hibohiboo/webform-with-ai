@@ -19,7 +19,9 @@ export class BackendStack extends Stack {
       partitionKey: { name: "PK", type: AttributeType.STRING },
       sortKey: { name: "SK", type: AttributeType.STRING },
       billingMode: BillingMode.PROVISIONED,
-      pointInTimeRecovery: false, // コスト削減のため無効
+      pointInTimeRecoverySpecification: {
+        pointInTimeRecoveryEnabled: false, // コスト削減のため無効
+      },
       removalPolicy: RemovalPolicy.DESTROY,
     });
 
