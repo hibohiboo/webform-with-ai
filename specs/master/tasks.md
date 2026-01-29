@@ -111,7 +111,7 @@
   - ISO 8601形式でsubmittedAtを生成
   - DynamoDBにPutItem
   - 201レスポンスを返す（appIdの検証は行わない）
-- [ ] T030 [US1] `backend/tests/unit/submit-response.test.ts` を作成
+- [x] T030 [US1] `backend/tests/unit/submit-response.test.ts` を作成
 
 ### 3.2 フロントエンド実装
 
@@ -133,7 +133,7 @@
 
 ### 3.3 E2Eテスト
 
-- [ ] T037 [US1] `e2e/tests/submit-feedback.spec.ts` を作成
+- [x] T037 [US1] `e2e/tests/submit-feedback.spec.ts` を作成
   - シナリオ1: アプリ名が表示される
   - シナリオ2: 全項目入力して送信
   - シナリオ3: 空白で送信
@@ -161,14 +161,14 @@
   - Content-Type: text/csv; charset=utf-8
   - Content-Disposition: attachment; filename="feedback.csv"
   - isBase64Encoded: true
-- [ ] T040 [US2] `backend/tests/unit/csv.test.ts` を作成
+- [x] T040 [US2] `backend/tests/unit/csv.test.ts` を作成
   - BOMの存在確認
   - 特殊文字エスケープ
   - 動的カラム生成
 
 ### 4.2 E2Eテスト
 
-- [ ] T041 [US2] `e2e/tests/download-csv.spec.ts` を作成
+- [x] T041 [US2] `e2e/tests/download-csv.spec.ts` を作成
   - シナリオ1: CSVダウンロード成功
   - シナリオ2: 列構成の確認
   - シナリオ3: 未入力項目は空白
@@ -186,14 +186,14 @@
 
 ### 5.1 検証（実装は不要 — 設計時点で対応済み）
 
-- [ ] T042 [US3] スキーマ進化の動作確認
+- [x] T042 [US3] スキーマ進化の動作確認
   - form-definition.tsに新しいフィールドを追加
   - 新しい回答を送信
   - CSVダウンロードで新しい列が含まれ、過去の回答は空白であることを確認
 
 ### 5.2 E2Eテスト
 
-- [ ] T043 [US3] `e2e/tests/schema-evolution.spec.ts` を作成
+- [x] T043 [US3] `e2e/tests/schema-evolution.spec.ts` を作成
   - シナリオ1: 新しいフィールドの回答が記録される
   - シナリオ2: CSVに新しい列が含まれる
   - シナリオ3: 過去の回答は新しい列が空白
@@ -206,9 +206,9 @@
 
 **目的**: 複数のユーザーストーリーに影響する改善
 
-- [ ] T044 [P] `backend/tests/integration/api.test.ts` を作成（API統合テスト）
-- [ ] T045 [P] 全サブプロジェクトで `bun run lint` が通ることを確認
-- [ ] T046 [P] 全サブプロジェクトで `bun run test` が通ることを確認
+- [x] T044 [P] `backend/tests/integration/api.test.ts` を作成（API統合テスト）
+- [x] T045 [P] 全サブプロジェクトで `bun run lint` が通ることを確認
+- [x] T046 [P] 全サブプロジェクトで `bun run test` が通ることを確認
 - [ ] T047 `quickstart.md` の手順を実行して動作確認
 - [ ] T048 AWSへのデプロイ（`npm run cdk deploy`）※infrastructure は npm を使用
 
