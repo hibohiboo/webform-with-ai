@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { Model } from "survey-core";
 import { Survey } from "survey-react-ui";
-import "survey-core/defaultV2.min.css";
+import { submitResponse } from "../lib/api";
 import { getAppConfig } from "../lib/apps-config";
 import { formDefinition } from "../lib/form-definition";
 import { detectLanguage, t } from "../lib/i18n";
-import { submitResponse } from "../lib/api";
+import "survey-core/survey-core.min.css";
 
 export default function FeedbackForm() {
   const { appId } = useParams<{ appId: string }>();

@@ -146,3 +146,7 @@ https://d3nw9s12usdo3l.cloudfront.net/
 https://kiuzitkug5.execute-api.ap-northeast-1.amazonaws.com/prod/api/responses/csv
 
 https://d3nw9s12usdo3l.cloudfront.net/api/responses/csv
+
+# フロントエンド動作確認(開発)
+
+http://localhost:5173/app1/form

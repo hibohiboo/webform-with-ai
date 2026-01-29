@@ -7,11 +7,12 @@ export default function ThankYou() {
   const lang = detectLanguage();
 
   const appConfig = appId ? getAppConfig(appId) : undefined;
-  const appName = appConfig
-    ? lang === "ja"
-      ? appConfig.name
-      : appConfig.nameEn
-    : "";
+  const getAppName = () => {
+    if (!appConfig) return "";
+    if (lang === "en") return appConfig.nameEn;
+    return appConfig.name;
+  };
+  const appName = getAppName();
 
   return (
     <div
@@ -41,9 +42,7 @@ export default function ThankYou() {
           {t("backToForm", lang)}
         </Link>
       )}
-      {appName && (
-        <p style={{ marginTop: "2rem", color: "#666" }}>{appName}</p>
-      )}
+      {appName && <p style={{ marginTop: "2rem", color: "#666" }}>{appName}</p>}
     </div>
   );
 }

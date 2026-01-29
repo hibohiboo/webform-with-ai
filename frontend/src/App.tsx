@@ -1,7 +1,7 @@
 import { createBrowserRouter, RouterProvider } from "react-router";
 import FeedbackForm from "./components/FeedbackForm";
-import ThankYou from "./components/ThankYou";
 import NotFound from "./components/NotFound";
+import ThankYou from "./components/ThankYou";
 
 const router = createBrowserRouter([
   {
