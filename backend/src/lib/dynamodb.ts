@@ -6,11 +6,24 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import type { FeedbackResponse } from "../shared/types";
 
-const client = new DynamoDBClient({});
+console.log("process.env.AWS_SAM_LOCAL", process.env.AWS_SAM_LOCAL);
+const isLocal = process.env.AWS_SAM_LOCAL === "true";
+const client = new DynamoDBClient({
+  ...(isLocal && {
+    region: "ap-northeast-1",
+    // eslint-disable-next-line sonarjs/no-clear-text-protocols
+    endpoint: "http://host.docker.internal:8000",
+    credentials: {
+      accessKeyId: "dummy",
+      secretAccessKey: "dummy",
+    },
+  }),
+});
 const docClient = DynamoDBDocumentClient.from(client);
 
 const TABLE_NAME = process.env.TABLE_NAME ?? "WebformResponses";
 
+console.log("TABLE_NAME", TABLE_NAME);
 /**
  * フィードバック回答をDynamoDBに保存
  */

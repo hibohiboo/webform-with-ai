@@ -12,6 +12,8 @@
     "predeploy": "npm run build:layer && cd ../frontend && bun run build",
     "deploy": "cdk deploy --all",
     "destroy": "cdk destroy --all",
+    "prelocal-api": "npm run synth",
+    "local-api": "sam local start-api -t ./cdk.out/WebformBackendStack.template.json --env-vars locals.json",
     "lint": "eslint ."
   },
   "devDependencies": {

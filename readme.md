@@ -154,3 +154,9 @@ http://localhost:5173/app1/form
 # 動作確認
 
 https://d3nw9s12usdo3l.cloudfront.net/app1/form
+
+# バックエンド動作確認 (開発)
+
+```
+winget install -e --id Amazon.SAM-CLI
+```
