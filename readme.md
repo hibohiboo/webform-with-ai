@@ -230,6 +230,14 @@ UI 挙動とエラーメッセージの責務分担を明確にしたい。
 
 ```
 
+## clarify で ClaudeがCSV期間追加の詳細を聞いてきたので回答
+
+![alt text](image/csv-q1.png)
+![alt text](image/csv-q2.png)
+![alt text](image/csv-q3.png)
+![alt text](image/csv-q4.png)
+![alt text](image/csv-q5.png)
+
 ## /speckit.plan で期間追加計画を立てる
 
 ```
