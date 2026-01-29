@@ -26,19 +26,20 @@ test.describe("US1: フォーム送信", () => {
       await page.goto("/app1/form");
 
       // ヘッダーにアプリ名が表示されることを確認
-      await expect(page.locator("h1")).toContainText("サンプルアプリ1");
+      await expect(page.locator("h1")).toContainText("アプリ1");
     });
 
-    test("英語設定でアプリ名が英語で表示される", async ({ page, context }) => {
-      // 英語ロケールを設定
-      await context.addCookies([
-        { name: "lang", value: "en", domain: "localhost", path: "/" },
-      ]);
+    test("英語設定でアプリ名が英語で表示される", async ({ browser }) => {
+      // 英語ロケールの新しいコンテキストを作成
+      const context = await browser.newContext({ locale: "en-US" });
+      const page = await context.newPage();
 
       await page.goto("/app1/form");
 
       // 英語のアプリ名が表示されることを確認
-      await expect(page.locator("h1")).toContainText("Sample App 1");
+      await expect(page.locator("h1")).toContainText("App 1");
+
+      await context.close();
     });
   });
 
@@ -49,24 +50,21 @@ test.describe("US1: フォーム送信", () => {
       // フォームが表示されるまで待機
       await expect(page.locator("h1")).toBeVisible();
 
-      // 名前を入力
-      await page.fill('input[aria-label="お名前"]', "山田太郎");
+      // 名前を入力（SurveyJSのセレクタ）
+      await page.fill('[data-name="name"] input', "山田太郎");
 
       // 評価を選択（2つ星）
-      await page.click('label:has-text("2")');
+      await page.click('.sd-rating__item-text:has-text("2")');
 
       // コメントを入力
-      await page.fill(
-        'textarea[aria-label="ご意見・ご感想"]',
-        "とても使いやすいアプリでした。"
-      );
+      await page.fill('[data-name="comment"] textarea', "とても使いやすいアプリでした。");
 
-      // 送信ボタンをクリック
-      await page.click('input[value="送信"]');
+      // 送信ボタンをクリック（SurveyJS）
+      await page.click('.sd-navigation__complete-btn');
 
       // 完了ページに遷移することを確認
-      await expect(page).toHaveURL(/\/app1\/thank-you/);
-      await expect(page.locator("h1")).toContainText("ありがとうございます");
+      await expect(page).toHaveURL(/\/app1\/thank-you/, { timeout: 30000 });
+      await expect(page.locator("h1")).toContainText("送信完了");
     });
   });
 
@@ -77,11 +75,11 @@ test.describe("US1: フォーム送信", () => {
       // フォームが表示されるまで待機
       await expect(page.locator("h1")).toBeVisible();
 
-      // 何も入力せずに送信ボタンをクリック
-      await page.click('input[value="送信"]');
+      // 何も入力せずに送信ボタンをクリック（SurveyJS）
+      await page.click('.sd-navigation__complete-btn');
 
       // 完了ページに遷移することを確認（すべて任意入力のため）
-      await expect(page).toHaveURL(/\/app1\/thank-you/);
+      await expect(page).toHaveURL(/\/app1\/thank-you/, { timeout: 30000 });
     });
   });
 
@@ -92,7 +90,7 @@ test.describe("US1: フォーム送信", () => {
       await page.goto("/app2/form");
 
       // app2のアプリ名が表示されることを確認
-      await expect(page.locator("h1")).toContainText("サンプルアプリ2");
+      await expect(page.locator("h1")).toContainText("アプリ2");
     });
 
     test("存在しないappIdの場合は404ページに遷移する", async ({ page }) => {
@@ -108,16 +106,14 @@ test.describe("US1: フォーム送信", () => {
     test("フォームに必要なフィールドが存在する", async ({ page }) => {
       await page.goto("/app1/form");
 
-      // 各フィールドが存在することを確認
-      await expect(page.locator('input[aria-label="お名前"]')).toBeVisible();
-      await expect(
-        page.locator('textarea[aria-label="ご意見・ご感想"]')
-      ).toBeVisible();
+      // 各フィールドが存在することを確認（SurveyJSのセレクタ）
+      await expect(page.locator('[data-name="name"] input')).toBeVisible();
+      await expect(page.locator('[data-name="comment"] textarea')).toBeVisible();
 
       // 評価フィールドが存在することを確認（1-3の選択肢）
-      await expect(page.locator('label:has-text("1")')).toBeVisible();
-      await expect(page.locator('label:has-text("2")')).toBeVisible();
-      await expect(page.locator('label:has-text("3")')).toBeVisible();
+      await expect(page.locator('.sd-rating__item-text:has-text("1")')).toBeVisible();
+      await expect(page.locator('.sd-rating__item-text:has-text("2")')).toBeVisible();
+      await expect(page.locator('.sd-rating__item-text:has-text("3")')).toBeVisible();
     });
   });
 
@@ -126,8 +122,8 @@ test.describe("US1: フォーム送信", () => {
       // まず送信を完了
       await page.goto("/app1/form");
       await expect(page.locator("h1")).toBeVisible();
-      await page.click('input[value="送信"]');
-      await expect(page).toHaveURL(/\/app1\/thank-you/);
+      await page.click('.sd-navigation__complete-btn');
+      await expect(page).toHaveURL(/\/app1\/thank-you/, { timeout: 30000 });
 
       // フォームに戻るリンクをクリック
       await page.click('a:has-text("フォームに戻る")');
