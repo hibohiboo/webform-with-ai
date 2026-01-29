@@ -240,6 +240,8 @@ UI 挙動とエラーメッセージの責務分担を明確にしたい。
 
 ## /speckit.plan で期間追加計画を立てる
 
+プロンプト
+
 ```
 /speckit.plan
 この仕様（specs/001-csv-date-filter/spec.md）に基づいて実装計画を作成してください。

@@ -1,0 +1,127 @@
+openapi: 3.0.3
+info:
+  title: Webform Feedback API - CSV Date Filter Extension
+  description: |
+    Extension to the existing CSV download API adding date range filtering.
+    This spec documents only the changes to /api/responses/csv endpoint.
+  version: 1.1.0
+
+servers:
+  - url: /api
+    description: API Gateway via CloudFront
+
+paths:
+  /responses/csv:
+    get:
+      summary: Download responses as CSV with optional date filter
+      description: |
+        Returns feedback responses as a CSV file, optionally filtered by date range.
+
+        **Date Range Filtering**:
+        - `from`: Include responses from this date (00:00:00.000 UTC) onwards
+        - `to`: Include responses up to this date (23:59:59.999 UTC)
+        - Both parameters are optional and can be used independently
+        - If neither is specified, all responses are returned (backward compatible)
+
+        **Date Format**: YYYY-MM-DD (e.g., 2026-01-15)
+
+        **Boundary Behavior**:
+        - `from=2026-01-15` includes data starting from 2026-01-15T00:00:00.000Z
+        - `to=2026-01-15` includes data up to 2026-01-15T23:59:59.999Z
+
+        **Edge Cases**:
+        - Future dates are allowed (may return empty result)
+        - If from > to, returns empty result (204 No Content)
+        - Invalid date format or non-existent date returns 400 Bad Request
+      operationId: downloadCsvWithDateFilter
+      parameters:
+        - name: from
+          in: query
+          required: false
+          description: Start date (inclusive) in YYYY-MM-DD format
+          schema:
+            type: string
+            pattern: "^\\d{4}-\\d{2}-\\d{2}$"
+          example: "2026-01-01"
+        - name: to
+          in: query
+          required: false
+          description: End date (inclusive) in YYYY-MM-DD format
+          schema:
+            type: string
+            pattern: "^\\d{4}-\\d{2}-\\d{2}$"
+          example: "2026-01-31"
+      responses:
+        "200":
+          description: CSV file download
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+              example: 'attachment; filename="feedback.csv"'
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+              example: |
+                responseId,appId,submittedAt,comment,name,rating
+                01HGW2XYZ123ABC,app1,2026-01-15T10:30:00.000Z,使いやすかった,山田太郎,2
+        "204":
+          description: |
+            No responses match the filter criteria.
+            This includes:
+            - No data in the specified date range
+            - from > to (empty result, not an error)
+            - No data exists at all
+        "400":
+          description: Invalid date parameter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DateValidationError"
+              examples:
+                invalidFormat:
+                  summary: Invalid date format
+                  value:
+                    error: "INVALID_DATE_FORMAT"
+                    message: "Invalid date format for 'from'. Expected YYYY-MM-DD."
+                invalidDate:
+                  summary: Non-existent date
+                  value:
+                    error: "INVALID_DATE"
+                    message: "Invalid date value for 'to': 2026-02-30 does not exist."
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    DateValidationError:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          enum:
+            - INVALID_DATE_FORMAT
+            - INVALID_DATE
+          description: Error code for programmatic handling
+        message:
+          type: string
+          description: Human-readable error description
+
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Error description
+          example: "Internal server error"
