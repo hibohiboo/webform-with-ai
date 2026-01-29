@@ -84,14 +84,14 @@
 
 ### 2.3 フロントエンド — 共有コード
 
-- [ ] T025 [P] `frontend/src/lib/apps-config.ts` を作成（アプリ定義の静的JSON設定）
+- [x] T025 [P] `frontend/src/lib/apps-config.ts` を作成（アプリ定義の静的JSON設定）
   - app1, app2 のサンプルデータを含む
   - AppConfig型定義（appId, name, nameEn）
-- [ ] T026 [P] `frontend/src/lib/form-definition.ts` を作成（SurveyJSフォーム定義JSON）
+- [x] T026 [P] `frontend/src/lib/form-definition.ts` を作成（SurveyJSフォーム定義JSON）
   - 名前、評価（1-3）、自由記述の3フィールド
   - 日本語/英語のローカライズ対応
-- [ ] T027 [P] `frontend/src/lib/i18n.ts` を作成（日本語/英語の翻訳設定）
-- [ ] T028 [P] `frontend/src/lib/api.ts` を作成（APIクライアント）
+- [x] T027 [P] `frontend/src/lib/i18n.ts` を作成（日本語/英語の翻訳設定）
+- [x] T028 [P] `frontend/src/lib/api.ts` を作成（APIクライアント）
   - submitResponse, downloadCsv関数
 
 **チェックポイント**: `npm run cdk synth` が成功し、CloudFormationテンプレートが生成されること（infrastructure は npm を使用）
@@ -115,21 +115,21 @@
 
 ### 3.2 フロントエンド実装
 
-- [ ] T031 [P] [US1] `frontend/src/main.tsx` を作成（エントリーポイント）
-- [ ] T032 [P] [US1] `frontend/src/App.tsx` を作成（React Router v7 createBrowserRouter）
+- [x] T031 [P] [US1] `frontend/src/main.tsx` を作成（エントリーポイント）
+- [x] T032 [P] [US1] `frontend/src/App.tsx` を作成（React Router v7 createBrowserRouter）
   - /:appId/form ルート
   - 404ページ
-- [ ] T033 [US1] `frontend/src/components/FeedbackForm.tsx` を作成
+- [x] T033 [US1] `frontend/src/components/FeedbackForm.tsx` を作成
   - apps-config.tsからアプリ情報を取得（静的設定）
   - 存在しないappIdの場合は404ページへリダイレクト
   - SurveyJSでフォームをレンダリング
   - onCompleteで回答をAPIに送信
   - アプリ名を動的に表示
-- [ ] T034 [US1] `frontend/src/components/ThankYou.tsx` を作成
+- [x] T034 [US1] `frontend/src/components/ThankYou.tsx` を作成
   - 送信完了メッセージを表示
-- [ ] T035 [US1] `frontend/src/components/NotFound.tsx` を作成
+- [x] T035 [US1] `frontend/src/components/NotFound.tsx` を作成
   - 404エラーページ
-- [ ] T036 [US1] `frontend/index.html` を作成
+- [x] T036 [US1] `frontend/index.html` を作成
 
 ### 3.3 E2Eテスト
 

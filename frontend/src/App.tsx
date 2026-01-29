@@ -1,19 +1,23 @@
-import { useEffect, useState } from "react";
+import { createBrowserRouter, RouterProvider } from "react-router";
+import FeedbackForm from "./components/FeedbackForm";
+import ThankYou from "./components/ThankYou";
+import NotFound from "./components/NotFound";
+
+const router = createBrowserRouter([
+  {
+    path: "/:appId/form",
+    element: <FeedbackForm />,
+  },
+  {
+    path: "/:appId/thank-you",
+    element: <ThankYou />,
+  },
+  {
+    path: "*",
+    element: <NotFound />,
+  },
+]);
 
 export default function App() {
-  const [message, setMessage] = useState<string>("loading...");
-
-  useEffect(() => {
-    fetch("/api/app1/responses", { method: "POST" })
-      .then((res) => res.json())
-      .then((data) => setMessage(data.message))
-      .catch(() => setMessage("hello (API not available)"));
-  }, []);
-
-  return (
-    <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
-      <h1>Webform Sample</h1>
-      <p>API Response: {message}</p>
-    </div>
-  );
+  return <RouterProvider router={router} />;
 }
