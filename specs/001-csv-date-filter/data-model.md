@@ -7,13 +7,13 @@
 
 ### DateRangeParams（新規）
 
-日付範囲フィルタのパラメータを表現する型。
+日付範囲フィルタのパラメータを表現する型。日付は日本時間（JST = UTC+9）として解釈される。
 
 ```typescript
 interface DateRangeParams {
-  /** 開始日（YYYY-MM-DD 形式）、未指定の場合は undefined */
+  /** 開始日（YYYY-MM-DD 形式、JST として解釈）、未指定の場合は undefined */
   from?: string;
-  /** 終了日（YYYY-MM-DD 形式）、未指定の場合は undefined */
+  /** 終了日（YYYY-MM-DD 形式、JST として解釈）、未指定の場合は undefined */
   to?: string;
 }
 ```
@@ -22,6 +22,7 @@ interface DateRangeParams {
 - `from`: `YYYY-MM-DD` 形式の文字列、有効な日付であること
 - `to`: `YYYY-MM-DD` 形式の文字列、有効な日付であること
 - 両方 undefined の場合は全件取得（後方互換性）
+- **タイムゾーン**: 入力日付は JST として解釈し、バックエンドで UTC に変換して比較
 
 ### DateValidationError（新規）
 
@@ -39,8 +40,8 @@ interface DateValidationError {
 **Error Codes**:
 | Code | Condition | Message Example |
 |------|-----------|-----------------|
-| `INVALID_DATE_FORMAT` | YYYY-MM-DD 形式でない | "Invalid date format for 'from'. Expected YYYY-MM-DD." |
-| `INVALID_DATE` | 存在しない日付 | "Invalid date value for 'to': 2026-02-30 does not exist." |
+| `INVALID_DATE_FORMAT` | YYYY-MM-DD 形式でない | "from パラメータは YYYY-MM-DD 形式で指定してください" |
+| `INVALID_DATE` | 存在しない日付 | "to パラメータに無効な日付が指定されています" |
 
 ### FeedbackResponse（既存・変更なし）
 
@@ -62,17 +63,24 @@ interface FeedbackResponse {
 
 ## フィルタリングロジック
 
-### 境界値計算
+### 境界値計算（JST → UTC 変換）
 
 ```
-入力: from = "2026-01-15"
-変換: fromTimestamp = "2026-01-15T00:00:00.000Z"
+入力: from = "2026-01-15" (JST)
+解釈: 2026-01-15 00:00:00.000 JST
+変換: fromTimestamp = "2026-01-14T15:00:00.000Z" (UTC)
 条件: response.submittedAt >= fromTimestamp
 
-入力: to = "2026-01-15"
-変換: toTimestamp = "2026-01-15T23:59:59.999Z"
+入力: to = "2026-01-15" (JST)
+解釈: 2026-01-15 23:59:59.999 JST
+変換: toTimestamp = "2026-01-15T14:59:59.999Z" (UTC)
 条件: response.submittedAt <= toTimestamp
 ```
+
+**JST → UTC 変換式**:
+- JST は UTC+9 のため、UTC = JST - 9時間
+- `from` (00:00:00 JST) → 前日 15:00:00 UTC
+- `to` (23:59:59.999 JST) → 同日 14:59:59.999 UTC
 
 ### フィルタ条件マトリクス
 
@@ -128,5 +136,5 @@ ISO 8601 形式は辞書順比較で時系列順になるため、Date オブジ
 
 | Rule | HTTP Status | Error Code | Error Message |
 |------|-------------|------------|---------------|
-| フォーマット不正 | 400 | `INVALID_DATE_FORMAT` | "Invalid date format for '{param}'. Expected YYYY-MM-DD." |
-| 無効な日付 | 400 | `INVALID_DATE` | "Invalid date value for '{param}': {value} does not exist." |
+| フォーマット不正 | 400 | `INVALID_DATE_FORMAT` | "{param} パラメータは YYYY-MM-DD 形式で指定してください" |
+| 無効な日付 | 400 | `INVALID_DATE` | "{param} パラメータに無効な日付が指定されています" |

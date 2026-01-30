@@ -21,7 +21,7 @@
 
 ### T001: 型定義追加
 
-- [ ] T001 [BE] `DateRangeParams` と `DateValidationError` 型を追加 in `backend/src/shared/types.ts`
+- [x] T001 [BE] `DateRangeParams` と `DateValidationError` 型を追加 in `backend/src/shared/types.ts`
 
 **FR**: FR-001, FR-002, FR-007a
 **変更対象**: 既存ファイル（追記）
@@ -41,7 +41,7 @@
 
 ### T002: 日付フィルタ ユニットテスト作成
 
-- [ ] T002 [BE] 日付バリデーション・フィルタのユニットテストを作成 in `backend/tests/unit/date-filter.test.ts`
+- [x] T002 [BE] 日付バリデーション・フィルタのユニットテストを作成 in `backend/tests/unit/date-filter.test.ts`
 
 **FR**: FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007, FR-007a
 **変更対象**: 新規ファイル
@@ -51,13 +51,13 @@
 - `validateDateValue`: 有効な日付（2026-01-31）→ null
 - `validateDateValue`: 無効な日付（2026-02-30, 2026-13-01）→ INVALID_DATE
 - `validateDateValue`: うるう年（2024-02-29 valid, 2026-02-29 invalid）
-- `toUtcTimestamp('2026-01-15', 'from')` → '2026-01-15T00:00:00.000Z'
-- `toUtcTimestamp('2026-01-15', 'to')` → '2026-01-15T23:59:59.999Z'
-- `filterByDateRange`: from のみ指定 → from 以降のデータのみ
-- `filterByDateRange`: to のみ指定 → to 以前のデータのみ
+- `toJstUtcTimestamp('2026-01-15', 'from')` → '2026-01-14T15:00:00.000Z'（JST 00:00:00 = UTC -9h）
+- `toJstUtcTimestamp('2026-01-15', 'to')` → '2026-01-15T14:59:59.999Z'（JST 23:59:59.999 = UTC -9h）
+- `filterByDateRange`: from のみ指定 → from（JST 00:00:00）以降のデータのみ
+- `filterByDateRange`: to のみ指定 → to（JST 23:59:59.999）以前のデータのみ
 - `filterByDateRange`: 両方指定 → 範囲内のデータのみ
 - `filterByDateRange`: 未指定 → 全件
-- `filterByDateRange`: 境界値（00:00:00.000Z, 23:59:59.999Z）が正しく含まれる
+- `filterByDateRange`: 境界値（JST→UTC変換後）が正しく含まれる
 
 **Done Criteria**:
 - テストファイルが作成されている
@@ -72,7 +72,7 @@
 
 ### T003: 日付フィルタユーティリティ実装
 
-- [ ] T003 [BE] 日付バリデーション・フィルタユーティリティを実装 in `backend/src/lib/date-filter.ts`
+- [x] T003 [BE] 日付バリデーション・フィルタユーティリティを実装 in `backend/src/lib/date-filter.ts`
 
 **FR**: FR-001, FR-002, FR-003, FR-007, FR-007a
 **変更対象**: 新規ファイル
@@ -80,8 +80,10 @@
 - `validateDateFormat(date, paramName)`: YYYY-MM-DD 形式チェック
 - `validateDateValue(date, paramName)`: 実在する日付かチェック
 - `validateDateRange(params)`: from/to パラメータの包括的検証
-- `toUtcTimestamp(date, type)`: UTC タイムスタンプ文字列への変換
-- `filterByDateRange(responses, params)`: 日付範囲でのフィルタリング
+- `toJstUtcTimestamp(date, type)`: JST 日付を UTC タイムスタンプ文字列へ変換
+  - `from`: 指定日 00:00:00 JST → 前日 15:00:00 UTC
+  - `to`: 指定日 23:59:59.999 JST → 同日 14:59:59.999 UTC
+- `filterByDateRange(responses, params)`: 日付範囲でのフィルタリング（JST→UTC変換後に比較）
 
 **Done Criteria**:
 - T002 のユニットテストがすべてパスする
@@ -90,7 +92,7 @@
 
 ### T004: ハンドラー修正
 
-- [ ] T004 [BE] CSV ダウンロードハンドラーに日付フィルタ機能を追加 in `backend/src/handlers/download-csv.ts`
+- [x] T004 [BE] CSV ダウンロードハンドラーに日付フィルタ機能を追加 in `backend/src/handlers/download-csv.ts`
 
 **FR**: FR-001〜FR-008, FR-007a
 **変更対象**: 既存ファイル（修正）
@@ -117,7 +119,7 @@
 
 ### T005: 統合テスト追加
 
-- [ ] T005 [BE] CSV ダウンロード API の日付フィルタ統合テストを追加 in `backend/tests/integration/api.test.ts`
+- [x] T005 [BE] CSV ダウンロード API の日付フィルタ統合テストを追加 in `backend/tests/integration/api.test.ts`
 
 **FR**: FR-001〜FR-008, FR-007a
 **変更対象**: 既存ファイル（追記）
@@ -137,7 +139,7 @@
 
 ### T006: バックエンド Lint・型チェック
 
-- [ ] T006 [BE] バックエンドの Lint・型チェックを実行 in `backend/`
+- [x] T006 [BE] バックエンドの Lint・型チェックを実行 in `backend/`
 
 **Done Criteria**:
 - `cd backend && bun run lint` がエラーなしで完了する
