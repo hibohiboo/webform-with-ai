@@ -18,16 +18,20 @@ paths:
         Returns feedback responses as a CSV file, optionally filtered by date range.
 
         **Date Range Filtering**:
-        - `from`: Include responses from this date (00:00:00.000 UTC) onwards
-        - `to`: Include responses up to this date (23:59:59.999 UTC)
+        - `from`: Include responses from this date, interpreted as Japan Standard Time (JST),
+          starting at 00:00:00.000 JST
+        - `to`: Include responses up to this date, interpreted as Japan Standard Time (JST),
+          ending at 23:59:59.999 JST
         - Both parameters are optional and can be used independently
         - If neither is specified, all responses are returned (backward compatible)
 
         **Date Format**: YYYY-MM-DD (e.g., 2026-01-15)
 
         **Boundary Behavior**:
-        - `from=2026-01-15` includes data starting from 2026-01-15T00:00:00.000Z
-        - `to=2026-01-15` includes data up to 2026-01-15T23:59:59.999Z
+        - `from=2026-01-15` includes data starting from
+          2026-01-15T00:00:00.000 JST (converted internally to 2026-01-14T15:00:00.000Z)
+        - `to=2026-01-15` includes data up to
+          2026-01-15T23:59:59.999 JST (converted internally to 2026-01-15T14:59:59.999Z)
 
         **Edge Cases**:
         - Future dates are allowed (may return empty result)
@@ -38,7 +42,8 @@ paths:
         - name: from
           in: query
           required: false
-          description: Start date (inclusive) in YYYY-MM-DD format
+          description: Start date (inclusive) in YYYY-MM-DD format.
+            Interpreted as a date in Japan Standard Time (JST).
           schema:
             type: string
             pattern: "^\\d{4}-\\d{2}-\\d{2}$"
@@ -47,6 +52,7 @@ paths:
           in: query
           required: false
           description: End date (inclusive) in YYYY-MM-DD format
+            Interpreted as a date in Japan Standard Time (JST).
           schema:
             type: string
             pattern: "^\\d{4}-\\d{2}-\\d{2}$"
