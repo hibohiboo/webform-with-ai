@@ -1,9 +1,8 @@
+import { TZDate } from '@date-fns/tz';
 import type { FeedbackResponse, DateRangeParams, DateValidationError } from '../shared/types';
 
 const DATE_FORMAT_REGEX = /^\d{4}-\d{2}-\d{2}$/;
-
-/** JST オフセット（時間）: UTC+9 */
-const JST_OFFSET_HOURS = 9;
+const TIMEZONE_JST = 'Asia/Tokyo';
 
 /**
  * 日付フォーマット検証 (YYYY-MM-DD)
@@ -77,8 +76,8 @@ export function validateDateRange(params: DateRangeParams): DateValidationError 
 
 /**
  * JST 日付文字列を UTC タイムスタンプに変換
- * - from: 指定日の 00:00:00.000 JST → 前日 15:00:00.000 UTC
- * - to: 指定日の 23:59:59.999 JST → 同日 14:59:59.999 UTC
+ * - from: 指定日の 00:00:00.000 JST → UTC ISO 文字列
+ * - to: 指定日の 23:59:59.999 JST → UTC ISO 文字列
  *
  * @param date 日付文字列 (YYYY-MM-DD形式、JST として解釈)
  * @param type 'from' (00:00:00 JST) または 'to' (23:59:59.999 JST)
@@ -88,17 +87,16 @@ export function toJstUtcTimestamp(date: string, type: 'from' | 'to'): string {
   const [year, month, day] = date.split('-').map(Number);
 
   if (type === 'from') {
-    // JST 00:00:00.000 → UTC -9時間 = 前日 15:00:00.000
-    const jstMidnight = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
-    const utcTimestamp = new Date(jstMidnight.getTime() - JST_OFFSET_HOURS * 60 * 60 * 1000);
-    return utcTimestamp.toISOString();
+    // JST 00:00:00.000 を UTC に変換
+    const jstMidnight = new TZDate(year, month - 1, day, 0, 0, 0, 0, TIMEZONE_JST);
+    // TZDate.toISOString() はタイムゾーン付きで返すため、Date に変換して UTC ISO 文字列を取得
+    return new Date(jstMidnight.getTime()).toISOString();
   }
 
   // type === 'to'
-  // JST 23:59:59.999 → UTC -9時間 = 同日 14:59:59.999
-  const jstEndOfDay = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
-  const utcTimestamp = new Date(jstEndOfDay.getTime() - JST_OFFSET_HOURS * 60 * 60 * 1000);
-  return utcTimestamp.toISOString();
+  // JST 23:59:59.999 を UTC に変換
+  const jstEndOfDay = new TZDate(year, month - 1, day, 23, 59, 59, 999, TIMEZONE_JST);
+  return new Date(jstEndOfDay.getTime()).toISOString();
 }
 
 /**
