@@ -155,7 +155,7 @@
 
 ### T007: 日付バリデーションユーティリティ作成
 
-- [ ] T007 [P] [FE] 日付バリデーションユーティリティを作成 in `frontend/src/utils/date-validation.ts`
+- [x] T007 [P] [FE] 日付バリデーションユーティリティを作成 in `frontend/src/utils/date-validation.ts`
 
 **FR**: FR-012, FR-015
 **変更対象**: 新規ファイル
@@ -179,7 +179,7 @@
 
 ### T008: 日付範囲フォームフック作成
 
-- [ ] T008 [FE] 日付範囲フォームのカスタムフックを作成 in `frontend/src/hooks/useDateRangeForm.ts`
+- [x] T008 [FE] 日付範囲フォームのカスタムフックを作成 in `frontend/src/hooks/useDateRangeForm.ts`
 
 **FR**: FR-010, FR-011, FR-012, FR-013, FR-014, FR-015
 **変更対象**: 新規ファイル
@@ -219,7 +219,7 @@ interface UseDateRangeFormReturn {
 
 ### T009: AdminDownload.tsx 修正
 
-- [ ] T009 [FE] CSV ダウンロード画面に日付入力 UI を追加 in `frontend/src/components/AdminDownload.tsx`
+- [x] T009 [FE] CSV ダウンロード画面に日付入力 UI を追加 in `frontend/src/components/AdminDownload.tsx`
 
 **FR**: FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-015, FR-016
 **変更対象**: 既存ファイル（修正）
@@ -262,7 +262,7 @@ interface UseDateRangeFormReturn {
 
 ### T010: フロントエンド Lint・ビルド確認
 
-- [ ] T010 [FE] フロントエンドの Lint・型チェック・ビルドを実行 in `frontend/`
+- [x] T010 [FE] フロントエンドの Lint・型チェック・ビルドを実行 in `frontend/`
 
 **Done Criteria**:
 - `cd frontend && bun run lint` がエラーなしで完了する
