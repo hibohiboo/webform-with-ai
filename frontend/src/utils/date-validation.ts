@@ -2,7 +2,9 @@
  * 日付バリデーションユーティリティ
  */
 
-const DATE_FORMAT_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+import { format, isValid, parse, startOfMonth } from 'date-fns';
+
+const DATE_FORMAT = 'yyyy-MM-dd';
 
 /**
  * YYYY-MM-DD 形式かつ有効な日付かを検証
@@ -10,18 +12,8 @@ const DATE_FORMAT_REGEX = /^\d{4}-\d{2}-\d{2}$/;
  * @returns 有効な場合 true
  */
 export function isValidDate(dateString: string): boolean {
-  if (!DATE_FORMAT_REGEX.test(dateString)) {
-    return false;
-  }
-
-  const [year, month, day] = dateString.split('-').map(Number);
-  const dateObj = new Date(year, month - 1, day);
-
-  return (
-    dateObj.getFullYear() === year &&
-    dateObj.getMonth() === month - 1 &&
-    dateObj.getDate() === day
-  );
+  const parsed = parse(dateString, DATE_FORMAT, new Date());
+  return isValid(parsed) && format(parsed, DATE_FORMAT) === dateString;
 }
 
 /**
@@ -29,10 +21,7 @@ export function isValidDate(dateString: string): boolean {
  * @returns 今月1日の日付文字列
  */
 export function getFirstDayOfCurrentMonth(): string {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  return `${year}-${month}-01`;
+  return format(startOfMonth(new Date()), DATE_FORMAT);
 }
 
 /**
@@ -40,11 +29,7 @@ export function getFirstDayOfCurrentMonth(): string {
  * @returns 本日の日付文字列
  */
 export function getToday(): string {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  return format(new Date(), DATE_FORMAT);
 }
 
 /**
