@@ -12,6 +12,8 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.978.0",
     "@aws-sdk/lib-dynamodb": "^3.978.0",
+    "@date-fns/tz": "^1.4.1",
+    "date-fns": "^4.1.0",
     "ulid": "^3.0.2"
   },
   "devDependencies": {

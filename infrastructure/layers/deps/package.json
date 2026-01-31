@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "Lambda layer dependencies",
   "dependencies": {
+    "@date-fns/tz": "^1.4.1",
+    "date-fns": "^4.1.0",
     "ulid": "^2.3.0"
   }
 }

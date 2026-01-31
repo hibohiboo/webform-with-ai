@@ -39,3 +39,24 @@ export interface SubmitResponseBody {
   comment?: string;
   [key: string]: unknown;
 }
+
+/**
+ * 日付範囲クエリパラメータ型
+ * CSV ダウンロード API で使用
+ */
+export interface DateRangeParams {
+  /** 開始日 (YYYY-MM-DD形式) */
+  from?: string;
+  /** 終了日 (YYYY-MM-DD形式) */
+  to?: string;
+}
+
+/**
+ * 日付バリデーションエラー型 (FR-007a)
+ */
+export interface DateValidationError {
+  /** エラーコード */
+  error: 'INVALID_DATE_FORMAT' | 'INVALID_DATE';
+  /** エラーメッセージ */
+  message: string;
+}

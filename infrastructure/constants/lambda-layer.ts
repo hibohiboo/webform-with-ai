@@ -7,5 +7,7 @@ export const externalModules = [
   "@aws-sdk/client-dynamodb",
   "@aws-sdk/lib-dynamodb",
   // Layer に含めるモジュール
+  "@date-fns/tz",
+  "date-fns",
   "ulid",
 ];

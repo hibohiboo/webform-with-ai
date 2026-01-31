@@ -89,18 +89,20 @@ const createSubmitEvent = (
   isBase64Encoded: false,
 });
 
-const createDownloadCsvEvent = (): APIGatewayProxyEvent => ({
-  httpMethod: "GET",
-  path: "/api/responses/csv",
+const createDownloadCsvEvent = (
+  queryParams?: Record<string, string> | null
+): APIGatewayProxyEvent => ({
+  httpMethod: 'GET',
+  path: '/api/responses/csv',
   pathParameters: null,
   body: null,
   headers: {},
   multiValueHeaders: {},
-  queryStringParameters: null,
+  queryStringParameters: queryParams ?? null,
   multiValueQueryStringParameters: null,
   stageVariables: null,
-  requestContext: {} as APIGatewayProxyEvent["requestContext"],
-  resource: "",
+  requestContext: {} as APIGatewayProxyEvent['requestContext'],
+  resource: '',
   isBase64Encoded: false,
 });
 
@@ -330,6 +332,193 @@ describe("API統合テスト", () => {
 
       // Scanが2回呼ばれた
       expect(mockSend).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('日付範囲フィルタ', () => {
+    // テストデータ: UTC タイムスタンプで保存
+    // JST で考えると:
+    // - 01: 2026-01-10 19:00:00 JST
+    // - 02: 2026-01-15 00:00:00 JST (境界値)
+    // - 03: 2026-01-15 12:00:00 JST
+    // - 04: 2026-01-15 23:59:59.999 JST (境界値)
+    // - 05: 2026-01-21 00:00:00 JST
+    const mockDateRangeItems = [
+      {
+        PK: 'RESPONSE#01',
+        SK: 'app1#2026-01-10T10:00:00.000Z',
+        responseId: '01',
+        appId: 'app1',
+        submittedAt: '2026-01-10T10:00:00.000Z', // = 2026-01-10 19:00:00 JST
+        name: 'ユーザー1',
+      },
+      {
+        PK: 'RESPONSE#02',
+        SK: 'app1#2026-01-14T15:00:00.000Z',
+        responseId: '02',
+        appId: 'app1',
+        submittedAt: '2026-01-14T15:00:00.000Z', // = 2026-01-15 00:00:00 JST
+        name: 'ユーザー2（境界値開始）',
+      },
+      {
+        PK: 'RESPONSE#03',
+        SK: 'app1#2026-01-15T03:00:00.000Z',
+        responseId: '03',
+        appId: 'app1',
+        submittedAt: '2026-01-15T03:00:00.000Z', // = 2026-01-15 12:00:00 JST
+        name: 'ユーザー3',
+      },
+      {
+        PK: 'RESPONSE#04',
+        SK: 'app1#2026-01-15T14:59:59.999Z',
+        responseId: '04',
+        appId: 'app1',
+        submittedAt: '2026-01-15T14:59:59.999Z', // = 2026-01-15 23:59:59.999 JST
+        name: 'ユーザー4（境界値終了）',
+      },
+      {
+        PK: 'RESPONSE#05',
+        SK: 'app1#2026-01-20T15:00:00.000Z',
+        responseId: '05',
+        appId: 'app1',
+        submittedAt: '2026-01-20T15:00:00.000Z', // = 2026-01-21 00:00:00 JST
+        name: 'ユーザー5',
+      },
+    ];
+
+    it('from と to を指定すると範囲内のデータのみ返す', async () => {
+      mockSend.mockResolvedValueOnce({
+        Items: mockDateRangeItems,
+        LastEvaluatedKey: undefined,
+      });
+
+      const event = createDownloadCsvEvent({ from: '2026-01-15', to: '2026-01-15' });
+      const result = await downloadCsvHandler(event, mockContext, () => {});
+
+      expect(result).toMatchObject({ statusCode: 200 });
+      const csvContent = (result as { body: string }).body;
+      // 2026-01-15 JST のデータのみ
+      expect(csvContent).toContain('ユーザー2（境界値開始）');
+      expect(csvContent).toContain('ユーザー3');
+      expect(csvContent).toContain('ユーザー4（境界値終了）');
+      expect(csvContent).not.toContain('ユーザー1');
+      expect(csvContent).not.toContain('ユーザー5');
+    });
+
+    it('from のみ指定するとその日（JST）以降のデータを返す', async () => {
+      mockSend.mockResolvedValueOnce({
+        Items: mockDateRangeItems,
+        LastEvaluatedKey: undefined,
+      });
+
+      const event = createDownloadCsvEvent({ from: '2026-01-15' });
+      const result = await downloadCsvHandler(event, mockContext, () => {});
+
+      expect(result).toMatchObject({ statusCode: 200 });
+      const csvContent = (result as { body: string }).body;
+      expect(csvContent).toContain('ユーザー2（境界値開始）');
+      expect(csvContent).toContain('ユーザー3');
+      expect(csvContent).toContain('ユーザー4（境界値終了）');
+      expect(csvContent).toContain('ユーザー5');
+      expect(csvContent).not.toContain('ユーザー1');
+    });
+
+    it('to のみ指定するとその日（JST）以前のデータを返す', async () => {
+      mockSend.mockResolvedValueOnce({
+        Items: mockDateRangeItems,
+        LastEvaluatedKey: undefined,
+      });
+
+      const event = createDownloadCsvEvent({ to: '2026-01-15' });
+      const result = await downloadCsvHandler(event, mockContext, () => {});
+
+      expect(result).toMatchObject({ statusCode: 200 });
+      const csvContent = (result as { body: string }).body;
+      expect(csvContent).toContain('ユーザー1');
+      expect(csvContent).toContain('ユーザー2（境界値開始）');
+      expect(csvContent).toContain('ユーザー3');
+      expect(csvContent).toContain('ユーザー4（境界値終了）');
+      expect(csvContent).not.toContain('ユーザー5');
+    });
+
+    it('パラメータなしで全件返す（後方互換性）', async () => {
+      mockSend.mockResolvedValueOnce({
+        Items: mockDateRangeItems,
+        LastEvaluatedKey: undefined,
+      });
+
+      const event = createDownloadCsvEvent();
+      const result = await downloadCsvHandler(event, mockContext, () => {});
+
+      expect(result).toMatchObject({ statusCode: 200 });
+      const csvContent = (result as { body: string }).body;
+      expect(csvContent).toContain('ユーザー1');
+      expect(csvContent).toContain('ユーザー2（境界値開始）');
+      expect(csvContent).toContain('ユーザー3');
+      expect(csvContent).toContain('ユーザー4（境界値終了）');
+      expect(csvContent).toContain('ユーザー5');
+    });
+
+    it('不正なフォーマットの日付で 400 + INVALID_DATE_FORMAT を返す', async () => {
+      const event = createDownloadCsvEvent({ from: '2026/01/15' });
+      const result = await downloadCsvHandler(event, mockContext, () => {});
+
+      expect(result).toMatchObject({ statusCode: 400 });
+      const body = JSON.parse((result as { body: string }).body);
+      expect(body.error).toBe('INVALID_DATE_FORMAT');
+      expect(body.message).toContain('from');
+    });
+
+    it('無効な日付で 400 + INVALID_DATE を返す', async () => {
+      const event = createDownloadCsvEvent({ to: '2026-02-30' });
+      const result = await downloadCsvHandler(event, mockContext, () => {});
+
+      expect(result).toMatchObject({ statusCode: 400 });
+      const body = JSON.parse((result as { body: string }).body);
+      expect(body.error).toBe('INVALID_DATE');
+      expect(body.message).toContain('to');
+    });
+
+    it('該当データなしの場合 204 No Content を返す', async () => {
+      mockSend.mockResolvedValueOnce({
+        Items: mockDateRangeItems,
+        LastEvaluatedKey: undefined,
+      });
+
+      const event = createDownloadCsvEvent({ from: '2027-01-01', to: '2027-12-31' });
+      const result = await downloadCsvHandler(event, mockContext, () => {});
+
+      expect(result).toMatchObject({ statusCode: 204 });
+    });
+
+    it('境界値: JST 00:00:00 のデータが from 指定時に含まれる', async () => {
+      mockSend.mockResolvedValueOnce({
+        Items: mockDateRangeItems,
+        LastEvaluatedKey: undefined,
+      });
+
+      const event = createDownloadCsvEvent({ from: '2026-01-15' });
+      const result = await downloadCsvHandler(event, mockContext, () => {});
+
+      expect(result).toMatchObject({ statusCode: 200 });
+      const csvContent = (result as { body: string }).body;
+      // 2026-01-15 00:00:00 JST = 2026-01-14T15:00:00.000Z
+      expect(csvContent).toContain('ユーザー2（境界値開始）');
+    });
+
+    it('境界値: JST 23:59:59.999 のデータが to 指定時に含まれる', async () => {
+      mockSend.mockResolvedValueOnce({
+        Items: mockDateRangeItems,
+        LastEvaluatedKey: undefined,
+      });
+
+      const event = createDownloadCsvEvent({ to: '2026-01-15' });
+      const result = await downloadCsvHandler(event, mockContext, () => {});
+
+      expect(result).toMatchObject({ statusCode: 200 });
+      const csvContent = (result as { body: string }).body;
+      // 2026-01-15 23:59:59.999 JST = 2026-01-15T14:59:59.999Z
+      expect(csvContent).toContain('ユーザー4（境界値終了）');
     });
   });
 });
