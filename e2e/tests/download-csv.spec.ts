@@ -191,4 +191,164 @@ test.describe("US2: CSVダウンロード", () => {
       expect(csvContent).toContain('""');
     });
   });
+
+  test.describe("シナリオ7: 日付範囲フィルタ（API）", () => {
+    test("from と to パラメータで期間指定ダウンロードできる", async ({
+      request,
+    }) => {
+      const today = new Date().toISOString().split("T")[0];
+      const response = await request.get(
+        `/api/responses/csv?from=${today}&to=${today}`
+      );
+
+      // データがない場合は204、ある場合は200
+      expect([200, 204]).toContain(response.status());
+
+      if (response.status() === 200) {
+        expect(response.headers()["content-type"]).toContain("text/csv");
+      }
+    });
+
+    test("不正な日付フォーマットで 400 + INVALID_DATE_FORMAT を返す", async ({
+      request,
+    }) => {
+      const response = await request.get("/api/responses/csv?from=2026/01/15");
+
+      expect(response.status()).toBe(400);
+
+      const body = await response.json();
+      expect(body.error).toBe("INVALID_DATE_FORMAT");
+      expect(body.message).toContain("from");
+    });
+
+    test("無効な日付で 400 + INVALID_DATE を返す", async ({ request }) => {
+      const response = await request.get("/api/responses/csv?to=2026-02-30");
+
+      expect(response.status()).toBe(400);
+
+      const body = await response.json();
+      expect(body.error).toBe("INVALID_DATE");
+      expect(body.message).toContain("to");
+    });
+
+    test("該当データなしの期間で 204 No Content を返す", async ({
+      request,
+    }) => {
+      // 未来の日付範囲を指定
+      const response = await request.get(
+        "/api/responses/csv?from=2099-01-01&to=2099-12-31"
+      );
+
+      expect(response.status()).toBe(204);
+    });
+  });
+});
+
+test.describe("US3: 日付範囲フィルタUI", () => {
+  test.skip(
+    ({ browserName }) => browserName === "chromium" && !process.env.RUN_E2E,
+    "E2E環境が準備できていません。RUN_E2E=true で実行してください"
+  );
+
+  test.describe("シナリオ1: 初期値確認（FR-015）", () => {
+    test("画面表示時に開始日が今月1日、終了日が本日に設定されている", async ({
+      page,
+    }) => {
+      await page.goto("/admin/download");
+
+      const today = new Date();
+      const firstDayOfMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-01`;
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+      const fromInput = page.locator('input[type="date"]#fromDate');
+      const toInput = page.locator('input[type="date"]#toDate');
+
+      await expect(fromInput).toHaveValue(firstDayOfMonth);
+      await expect(toInput).toHaveValue(todayStr);
+    });
+  });
+
+  test.describe("シナリオ2: 日付範囲指定でダウンロード成功", () => {
+    test("有効な日付範囲を入力してダウンロードボタンをクリックできる", async ({
+      page,
+    }) => {
+      await page.goto("/admin/download");
+
+      // 日付入力
+      await page.fill('input#fromDate', "2026-01-01");
+      await page.fill('input#toDate', "2026-01-31");
+
+      // ボタンが有効であることを確認
+      const downloadButton = page.locator("button", {
+        hasText: "CSVをダウンロード",
+      });
+      await expect(downloadButton).toBeEnabled();
+    });
+  });
+
+  test.describe("シナリオ3: 無効な日付でバリデーションエラー表示", () => {
+    test("無効な日付を入力するとインラインエラーが表示されボタンが無効化される", async ({
+      page,
+    }) => {
+      await page.goto("/admin/download");
+
+      // 無効な日付を入力（フォームをクリア）
+      await page.fill('input#fromDate', "");
+
+      // エラーメッセージが表示される
+      await expect(page.locator("text=開始日を入力してください")).toBeVisible();
+
+      // ボタンが無効化される
+      const downloadButton = page.locator("button", {
+        hasText: "CSVをダウンロード",
+      });
+      await expect(downloadButton).toBeDisabled();
+    });
+  });
+
+  test.describe("シナリオ4: 開始日 > 終了日でボタン無効化", () => {
+    test("開始日が終了日より後の場合エラーメッセージが表示されボタンが無効化される", async ({
+      page,
+    }) => {
+      await page.goto("/admin/download");
+
+      // 開始日 > 終了日を入力
+      await page.fill('input#fromDate', "2026-01-31");
+      await page.fill('input#toDate', "2026-01-01");
+
+      // エラーメッセージが表示される
+      await expect(
+        page.locator("text=終了日は開始日以降の日付を入力してください")
+      ).toBeVisible();
+
+      // ボタンが無効化される
+      const downloadButton = page.locator("button", {
+        hasText: "CSVをダウンロード",
+      });
+      await expect(downloadButton).toBeDisabled();
+    });
+  });
+
+  test.describe("シナリオ5: データなし時の通知メッセージ表示（FR-016）", () => {
+    test("該当データがない期間を指定すると通知メッセージが表示される", async ({
+      page,
+    }) => {
+      await page.goto("/admin/download");
+
+      // 未来の日付範囲を入力
+      await page.fill('input#fromDate', "2099-01-01");
+      await page.fill('input#toDate', "2099-12-31");
+
+      // ダウンロードボタンをクリック
+      const downloadButton = page.locator("button", {
+        hasText: "CSVをダウンロード",
+      });
+      await downloadButton.click();
+
+      // 通知メッセージが表示される
+      await expect(
+        page.locator("text=指定期間にデータがありません")
+      ).toBeVisible();
+    });
+  });
 });

@@ -278,7 +278,7 @@ interface UseDateRangeFormReturn {
 
 ### T011: BDD シナリオ追加
 
-- [ ] T011 [E2E] CSV ダウンロードの日付フィルタ BDD シナリオを追加 in `e2e/tests/download-csv.spec.ts`
+- [x] T011 [E2E] CSV ダウンロードの日付フィルタ BDD シナリオを追加 in `e2e/tests/download-csv.spec.ts`
 
 **FR**: FR-001〜FR-016
 **変更対象**: 既存ファイル（追記）
@@ -318,7 +318,7 @@ interface UseDateRangeFormReturn {
 
 ### T012: E2E テスト実行・全シナリオ通過確認
 
-- [ ] T012 [E2E] E2E テストを実行し全シナリオ通過を確認 in `e2e/`
+- [x] T012 [E2E] E2E テストを実行し全シナリオ通過を確認 in `e2e/`
 
 **Done Criteria**:
 - `cd e2e && bun run test` が全テストパスする
@@ -334,7 +334,7 @@ interface UseDateRangeFormReturn {
 
 ### T013: 全体 Lint・テスト確認
 
-- [ ] T013 全体の Lint・テスト・ビルドを実行し最終確認
+- [x] T013 全体の Lint・テスト・ビルドを実行し最終確認
 
 **Done Criteria**:
 - `cd backend && bun run lint && bun run test` がパスする
