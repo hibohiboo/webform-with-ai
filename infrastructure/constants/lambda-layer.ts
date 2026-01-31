@@ -10,4 +10,5 @@ export const externalModules = [
   "@date-fns/tz",
   "date-fns",
   "ulid",
+  "papaparse",
 ];

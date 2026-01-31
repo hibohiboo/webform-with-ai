@@ -5,6 +5,7 @@
   "dependencies": {
     "@date-fns/tz": "^1.4.1",
     "date-fns": "^4.1.0",
-    "ulid": "^2.3.0"
+    "ulid": "^2.3.0",
+    "papaparse": "^5.5.3"
   }
 }
