@@ -10,17 +10,18 @@
     "lint": "eslint . --fix"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.978.0",
-    "@aws-sdk/lib-dynamodb": "^3.978.0",
+    "@aws-sdk/client-dynamodb": "^3.980.0",
+    "@aws-sdk/lib-dynamodb": "^3.980.0",
     "@date-fns/tz": "^1.4.1",
     "date-fns": "^4.1.0",
+    "papaparse": "^5.5.3",
     "ulid": "^3.0.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
     "@eslint/js": "^9.39.2",
     "@types/aws-lambda": "^8.10.160",
-    "@types/node": "^24.10.7",
+    "@types/node": "^24.10.9",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
