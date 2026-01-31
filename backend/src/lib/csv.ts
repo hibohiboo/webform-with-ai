@@ -1,3 +1,4 @@
+import Papa from "papaparse";
 import type { FeedbackResponse } from "../shared/types";
 
 // UTF-8 BOM for Excel compatibility
@@ -10,26 +11,10 @@ const FIXED_COLUMNS = ["responseId", "appId", "submittedAt"];
 const EXCLUDED_KEYS = ["PK", "SK"];
 
 /**
- * RFC 4180 に準拠した CSV エスケープ
- * - ダブルクォートを含む場合は "" にエスケープ
- * - カンマ、改行、ダブルクォートを含む場合は全体をダブルクォートで囲む
- */
-function escapeField(value: unknown): string {
-  if (value === null || value === undefined) {
-    return "";
-  }
-
-  const str = String(value);
-  const needsQuoting = /[",\n\r]/.test(str);
-  const escaped = str.replace(/"/g, '""');
-
-  return needsQuoting ? `"${escaped}"` : escaped;
-}
-
-/**
  * フィードバック回答の配列から BOM 付き UTF-8 CSV を生成
  * - 動的カラム: 全レコードに存在する属性の和集合
  * - 固定カラム（responseId, appId, submittedAt）は常に先頭
+ * - RFC 4180 準拠のエスケープは papaparse が自動処理
  */
 export function generateCsv(responses: FeedbackResponse[]): string {
   if (responses.length === 0) {
@@ -49,14 +34,11 @@ export function generateCsv(responses: FeedbackResponse[]): string {
   // カラム順序: 固定カラム + 動的カラム（アルファベット順）
   const columns = [...FIXED_COLUMNS, ...[...dynamicColumns].sort()];
 
-  // ヘッダー行
-  const headerRow = columns.map(escapeField).join(",");
+  // papaparse で CSV 生成（RFC 4180 準拠のエスケープを自動処理）
+  const csv = Papa.unparse(responses, {
+    columns,
+    newline: "\r\n",
+  });
 
-  // データ行
-  const dataRows = responses.map((response) =>
-    columns.map((col) => escapeField(response[col])).join(","),
-  );
-
-  // BOM + ヘッダー + データ
-  return BOM + [headerRow, ...dataRows].join("\r\n");
+  return BOM + csv;
 }
