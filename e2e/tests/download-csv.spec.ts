@@ -254,7 +254,7 @@ test.describe("US3: 日付範囲フィルタUI", () => {
     test("画面表示時に開始日が今月1日、終了日が本日に設定されている", async ({
       page,
     }) => {
-      await page.goto("/admin/download");
+      await page.goto("/admin");
 
       const today = new Date();
       const firstDayOfMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-01`;
@@ -272,7 +272,7 @@ test.describe("US3: 日付範囲フィルタUI", () => {
     test("有効な日付範囲を入力してダウンロードボタンをクリックできる", async ({
       page,
     }) => {
-      await page.goto("/admin/download");
+      await page.goto("/admin");
 
       // 日付入力
       await page.fill('input#fromDate', "2026-01-01");
@@ -290,7 +290,7 @@ test.describe("US3: 日付範囲フィルタUI", () => {
     test("無効な日付を入力するとインラインエラーが表示されボタンが無効化される", async ({
       page,
     }) => {
-      await page.goto("/admin/download");
+      await page.goto("/admin");
 
       // 無効な日付を入力（フォームをクリア）
       await page.fill('input#fromDate', "");
@@ -310,7 +310,7 @@ test.describe("US3: 日付範囲フィルタUI", () => {
     test("開始日が終了日より後の場合エラーメッセージが表示されボタンが無効化される", async ({
       page,
     }) => {
-      await page.goto("/admin/download");
+      await page.goto("/admin");
 
       // 開始日 > 終了日を入力
       await page.fill('input#fromDate', "2026-01-31");
@@ -333,7 +333,7 @@ test.describe("US3: 日付範囲フィルタUI", () => {
     test("該当データがない期間を指定すると通知メッセージが表示される", async ({
       page,
     }) => {
-      await page.goto("/admin/download");
+      await page.goto("/admin");
 
       // 未来の日付範囲を入力
       await page.fill('input#fromDate', "2099-01-01");
