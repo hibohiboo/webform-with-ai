@@ -18,7 +18,6 @@ yarn-error.log*
 .env.*.local
 
 # IDE
-.vscode/
 .idea/
 *.swp
 *.swo
@@ -41,3 +40,6 @@ coverage/
 test-results/
 playwright-report/
 playwright/.cache/
+
+
+

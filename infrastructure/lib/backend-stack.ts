@@ -18,7 +18,7 @@ export class BackendStack extends Stack {
       tableName: "WebformResponses",
       partitionKey: { name: "PK", type: AttributeType.STRING },
       sortKey: { name: "SK", type: AttributeType.STRING },
-      billingMode: BillingMode.PROVISIONED,
+      billingMode: BillingMode.PAY_PER_REQUEST,
       pointInTimeRecoverySpecification: {
         pointInTimeRecoveryEnabled: false, // コスト削減のため無効
       },

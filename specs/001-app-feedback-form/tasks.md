@@ -62,7 +62,7 @@
 - [x] T018 `infrastructure/bin/app.ts` を作成（CDKアプリのエントリーポイント）
 - [x] T019 `infrastructure/lib/backend-stack.ts` を作成（API Gateway, Lambda, DynamoDB）
   - DynamoDBテーブル: WebformResponses（PK, SK, GSI: AppIdIndex）
-  - 課金方式: PROVISIONED（無料枠対応）
+  - 課金方式: PAY_PER_REQUEST（無料枠対応）
   - ポイントインタイムリカバリ: 無効（コスト削減のため）
   - Lambdaランタイム: NODEJS_24_X
   - Lambda Layer: ulid を共有依存関係として配置

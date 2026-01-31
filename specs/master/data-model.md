@@ -83,7 +83,7 @@ type FeedbackResponse = {
 | rating | Number | 任意の評価値 |
 | comment | String | 任意の自由記述コメント |
 
-**課金方式**: PROVISIONED（無料枠対応）
+**課金方式**: PAY_PER_REQUEST（無料枠対応）
 **暗号化**: AWSマネージド暗号化
 **ポイントインタイムリカバリ**: 無効（コスト削減のため）
 
