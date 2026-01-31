@@ -55,12 +55,9 @@ export function useDateRangeForm(): UseDateRangeFormReturn {
     const error = validateFrom(value);
     setFromError(error);
 
-    // fromが変わった場合、toのエラーも再チェック（開始日 > 終了日の検証）
+    // fromが変わった場合、toのエラーをクリア（toErrorWithRangeCheckで再評価される）
     if (!error) {
-      setToError((prevToError) => {
-        // toDateの値を使って再バリデーション
-        return null; // 一旦クリア、setToDateInternal後に再評価される
-      });
+      setToError(null);
     }
   }, [validateFrom]);
 
