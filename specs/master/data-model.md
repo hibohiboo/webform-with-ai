@@ -163,3 +163,68 @@ AppConfig (JSON設定)            FeedbackResponse (DynamoDB)
 - 1つのAppに対して複数のResponseが存在する（1:N）
 - リレーションシップはアプリケーション層で管理（データベースの外部キーではない）
 - リクエスト内の無効なappId → フロントエンドが静的設定を参照し404ページを表示（バックエンドは検証しない）
+
+---
+
+## 日付フィルタリング
+
+### DateRangeParams
+
+CSVダウンロード時の日付範囲フィルタパラメータ。日付は日本時間（JST = UTC+9）として解釈される。
+
+```typescript
+interface DateRangeParams {
+  /** 開始日（YYYY-MM-DD 形式、JST として解釈）、未指定の場合は undefined */
+  from?: string;
+  /** 終了日（YYYY-MM-DD 形式、JST として解釈）、未指定の場合は undefined */
+  to?: string;
+}
+```
+
+**Validation Rules**:
+- `from`: `YYYY-MM-DD` 形式の文字列、有効な日付であること
+- `to`: `YYYY-MM-DD` 形式の文字列、有効な日付であること
+- 両方 undefined の場合は全件取得（後方互換性）
+
+### DateValidationError
+
+日付バリデーションエラーレスポンス。
+
+```typescript
+interface DateValidationError {
+  /** エラーコード */
+  error: 'INVALID_DATE_FORMAT' | 'INVALID_DATE';
+  /** エラーメッセージ */
+  message: string;
+}
+```
+
+| Code | Condition | Message Example |
+|------|-----------|-----------------|
+| `INVALID_DATE_FORMAT` | YYYY-MM-DD 形式でない | "from パラメータは YYYY-MM-DD 形式で指定してください" |
+| `INVALID_DATE` | 存在しない日付 | "to パラメータに無効な日付が指定されています" |
+
+### JST → UTC 変換ロジック
+
+日付パラメータは JST として解釈し、UTC に変換して `submittedAt` と比較する。
+
+```
+入力: from = "2026-01-15" (JST)
+解釈: 2026-01-15 00:00:00.000 JST
+変換: fromTimestamp = "2026-01-14T15:00:00.000Z" (UTC)
+条件: response.submittedAt >= fromTimestamp
+
+入力: to = "2026-01-15" (JST)
+解釈: 2026-01-15 23:59:59.999 JST
+変換: toTimestamp = "2026-01-15T14:59:59.999Z" (UTC)
+条件: response.submittedAt <= toTimestamp
+```
+
+### フィルタ条件マトリクス
+
+| from | to | 条件 |
+|------|----|------|
+| 指定 | 指定 | `fromTimestamp <= submittedAt <= toTimestamp` |
+| 指定 | 未指定 | `fromTimestamp <= submittedAt` |
+| 未指定 | 指定 | `submittedAt <= toTimestamp` |
+| 未指定 | 未指定 | フィルタなし（全件）|

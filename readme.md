@@ -343,3 +343,7 @@ date-filter.ts を date-fns / date-fns-tz を使って
 - バックエンド/API/Spec/OpenAPI には一切触りません
 - tasks.md に書かれていないことは実装しません
 ```
+
+## 最終チェック
+
+最後に、今回編集がspecs/masterに反映されているか確認して、不足していたら修正して。

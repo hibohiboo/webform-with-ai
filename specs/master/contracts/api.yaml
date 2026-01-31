@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Webform Feedback API
   description: API for collecting and exporting user feedback across multiple applications
-  version: 1.0.0
+  version: 1.1.0
 
 servers:
   - url: /api
@@ -59,14 +59,39 @@ paths:
 
   /responses/csv:
     get:
-      summary: Download all responses as CSV
+      summary: Download responses as CSV with optional date filter
       description: |
-        Returns all feedback responses across all apps as a CSV file.
+        Returns feedback responses as a CSV file, optionally filtered by date range.
         The CSV uses UTF-8 encoding with BOM for Excel compatibility.
         Columns include all fields that exist in any response.
         Missing fields in older responses appear as empty cells.
         No authentication required (MVP).
+
+        **Date Range Filtering**:
+        - `from`: Include responses from this date (JST 00:00:00.000)
+        - `to`: Include responses up to this date (JST 23:59:59.999)
+        - Both parameters are optional and can be used independently
+        - If neither is specified, all responses are returned (backward compatible)
+
+        **Date Format**: YYYY-MM-DD (e.g., 2026-01-15)
       operationId: downloadCsv
+      parameters:
+        - name: from
+          in: query
+          required: false
+          description: Start date (inclusive) in YYYY-MM-DD format, interpreted as JST
+          schema:
+            type: string
+            pattern: "^\\d{4}-\\d{2}-\\d{2}$"
+          example: "2026-01-01"
+        - name: to
+          in: query
+          required: false
+          description: End date (inclusive) in YYYY-MM-DD format, interpreted as JST
+          schema:
+            type: string
+            pattern: "^\\d{4}-\\d{2}-\\d{2}$"
+          example: "2026-01-31"
       responses:
         "200":
           description: CSV file download
@@ -84,7 +109,13 @@ paths:
                 responseId,appId,submittedAt,comment,name,rating
                 01HGW2XYZ123ABC,app1,2026-01-28T10:30:00.000Z,使いやすかった,山田太郎,2
         "204":
-          description: No responses exist yet
+          description: No responses match the filter criteria or no data exists
+        "400":
+          description: Invalid date parameter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DateValidationError"
 
 components:
   schemas:
@@ -133,3 +164,20 @@ components:
           type: string
           description: Error description
           example: "App not found"
+
+    DateValidationError:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          enum:
+            - INVALID_DATE_FORMAT
+            - INVALID_DATE
+          description: Error code for programmatic handling
+        message:
+          type: string
+          description: Human-readable error description
+          example: "from パラメータは YYYY-MM-DD 形式で指定してください"
