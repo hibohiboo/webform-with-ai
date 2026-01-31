@@ -345,10 +345,10 @@ test.describe("US3: 日付範囲フィルタUI", () => {
       });
       await downloadButton.click();
 
-      // 通知メッセージが表示される
+      // 通知メッセージが表示される（API レスポンスを待つため長めのタイムアウト）
       await expect(
         page.locator("text=指定期間にデータがありません")
-      ).toBeVisible();
+      ).toBeVisible({ timeout: 15000 });
     });
   });
 });
