@@ -1,5 +1,8 @@
 {
-  "Parameters": {
+  "SubmitResponseFnAA403554": {
+    "TABLE_NAME": "dev-demo-SampleTable-WebformResponses"
+  },
+  "DownloadCsvFnDF53652C": {
     "TABLE_NAME": "dev-demo-SampleTable-WebformResponses"
   }
 }
