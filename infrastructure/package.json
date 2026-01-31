@@ -13,7 +13,7 @@
     "deploy": "cdk deploy --all",
     "destroy": "cdk destroy --all",
     "prelocal-api": "npm run synth",
-    "local-api": "sam local start-api -t ./cdk.out/WebformBackendStack.template.json --env-vars locals.json",
+    "local-api": "cross-env AWS_ACCESS_KEY_ID=dummy AWS_SECRET_ACCESS_KEY=dummy sam local start-api -t ./cdk.out/WebformBackendStack.template.json --env-vars locals.json",
     "lint": "eslint ."
   },
   "devDependencies": {
@@ -22,6 +22,7 @@
     "aws-cdk": "^2.1104.0",
     "aws-cdk-lib": "^2.236.0",
     "constructs": "^10.4.5",
+    "cross-env": "^10.1.0",
     "esbuild": "^0.27.2",
     "fs-extra": "^11.3.3",
     "source-map-support": "^0.5.21",
